@@ -1,0 +1,71 @@
+
+Some Linux command lines used in this example
+=============================================
+
+
+# Extract featues for ~10K, ~100K, ~1000K characters of txt file
+----------------------------------------------------------------
+~$ head -10 ../en.txt | python3 trigram_feature_encoder.py > en10.feats
+~$ head -150 ../en.txt | python3 trigram_feature_encoder.py > en100.feats
+~$ head -1400 ../en.txt | python3 trigram_feature_encoder.py > en1000.feats
+
+
+# Learn parameters for a ME model using encoded text
+----------------------------------------------------
+
+~$ ./megam_i686.opt -quiet -nc -nobias multiclass en10.feats > model-en-10.dat
+~$ ./megam_i686.opt -quiet -nc -nobias multiclass en100.feats > model-en-100.dat
+~$ ./megam_i686.opt -quiet -nc -nobias multiclass en1000.feats > model-en-1000.dat
+
+
+# Generate random text using given model
+----------------------------------------
+~$ python3 generate.py model-en-1000.dat 400
+
+
+# Compute probability of a sentence
+-----------------------------------
+~$ python3 prob.py model-en-1000.dat <<< "The cat eats fish"
+._t 0.1502740083686408 0.1502740083686408
+_th 0.6396421146450949 0.0961215844891121
+the 0.6785561074647082 0.06522388821427197
+he_ 0.7232772351924326 0.04717495353611892
+e_c 0.0814417051740156 0.0038420086574864815
+_ca 0.15911717215180463 0.0006113295529620003
+cat 0.10040564314632296 6.138093693950374e-05
+at_ 0.345928752021298 2.123343091338052e-05
+t_e 0.022679158796526863 4.815563514796392e-07
+_ea 0.13567847582791456 6.533683179400896e-08
+eat 0.08933153392100399 5.836639405697443e-09
+ats 0.008770850238271528 5.1192290122166405e-11
+ts_ 0.7337495233152449 3.756231847455532e-11
+s_f 0.04930870943153507 1.85214944723663e-12
+_fi 0.17705625699055333 3.2793464851484003e-13
+fis 0.03283774373494998 1.0768633949741212e-14
+ish 0.0531649425162143 5.725138049161453e-16
+sh_ 0.14498818611115227 8.3007738098386e-17
+Sequence probability: 8.3007738098386e-17
+
+
+#############################################################33
+
+Second example: Text classification
+
+# Learn parameters for a ME model using encoded documents
+----------------------------------------------------
+
+~$ ./megam_i686.opt -quiet -nc -nobias multiclass data/EFE.train > model-efe.dat
+
+# Classify new documents and evaluate performance using megam
+-------------------------------------------------------------
+~$ ./megam_i686.opt -nc -nobias -predict model-efe.dat multiclass  data/EFE.test
+
+
+# Classify new documents and evaluate performance with our own code
+-------------------------------------------------------------------
+python3 classifier.py model-efe.dat < data/EFE.test
+
+
+# Improved code able to produce a variable number of answers
+------------------------------------------------------------
+python3 classifierPR.py model-efe.dat 0.1 < data/EFE.test
