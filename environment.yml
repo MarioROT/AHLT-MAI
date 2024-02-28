@@ -1,0 +1,6 @@
+name: AHLT
+channels:
+  - defaults
+dependencies:
+  - python=3.11
+prefix: /home/mario-rot/.conda/envs/AHLT

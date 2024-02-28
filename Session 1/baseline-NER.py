@@ -7,7 +7,7 @@ import re
 from xml.dom.minidom import parse
 from nltk.tokenize import word_tokenize
 
-import evaluator
+import util.evaluator as evaluator
 
 ## dictionary containig information from external knowledge resources
 ## WARNING: You may need to adjust the path to the resource files
@@ -44,7 +44,7 @@ def classify_token(txt):
    #          more and better rules
 
    if txt.lower() in external : return external[txt.lower()]
-   elif txt.isupper() : return "brand"
+   # elif txt.isupper() : return "brand"
    elif txt[-5:] in suffixes : return "drug"
    else : return "NONE"
 
