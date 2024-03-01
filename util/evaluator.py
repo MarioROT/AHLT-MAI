@@ -5,6 +5,9 @@ from os import listdir
 
 from xml.dom.minidom import parse
 
+import pandas as pd
+from neptune.types import File
+
 ## --
 ## -- auxliary to insert an instance in given instance_set
 ## --
@@ -134,25 +137,34 @@ def row(txt) :
    return txt + ' '*(17-len(txt))
 
 
-def print_statistics(gold,predicted) :
+def print_statistics(gold,predicted, save = None):
+    stats = {'kinds':[], 'tps':[], 'fps':[], 'fns':[], 'preds':[], 'exps':[], 'Ps':[], 'Rs':[], 'Fs':[]}
     print(row("")+"  tp\t  fp\t  fn\t#pred\t#exp\tP\tR\tF1")
     print("------------------------------------------------------------------------------")
     (nk,sP,sR,sF1) = (0,0,0,0)
     for kind in sorted(gold) :
         if kind=="CLASS" or kind=="NOCLASS" : continue
         (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, kind)
+        [stats[key].append([kind,tp,fp,fn,npred,nexp,P,R,F1][i]) for i, key in enumerate(stats.keys())]
         print(row(kind)+"{:>4}\t{:>4}\t{:>4}\t{:>4}\t{:>4}\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(tp,fp,fn,npred,nexp, P, R, F1))
         (nk,sP,sR,sF1) = (nk+1, sP+P, sR+R, sF1+F1)
 
     (sP, sR, sF1) = (sP/nk, sR/nk, sF1/nk)
     print("------------------------------------------------------------------------------")
+    [stats[key].append(["M.avg",'-','-','-','-','-',sP,sR,sF1][i]) for i, key in enumerate(stats.keys())]
     print(row("M.avg")+"-\t-\t-\t-\t-\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(sP, sR, sF1))
+    
 
     print("------------------------------------------------------------------------------")
     (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, "CLASS")
+    [stats[key].append(["m.avg",tp,fp,fn,npred,nexp,P,R,F1][i]) for i, key in enumerate(stats.keys())]
     print(row("m.avg")+"{:>4}\t{:>4}\t{:>4}\t{:>4}\t{:>4}\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(tp,fp,fn,npred,nexp, P, R, F1))                        
     (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, "NOCLASS")
+    [stats[key].append(["m.avg(no class)",tp,fp,fn,npred,nexp,P,R,F1][i]) for i, key in enumerate(stats.keys())]
     print(row("m.avg(no class)")+"{:>4}\t{:>4}\t{:>4}\t{:>4}\t{:>4}\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(tp,fp,fn,npred,nexp, P, R, F1))               
+
+    if save:
+        save["results/performance"].upload(File.as_html(pd.DataFrame(stats)))
 
 ## --
 ## -- Evaluates results in outfile comparing them with gold standard in golddir.
@@ -160,7 +172,7 @@ def print_statistics(gold,predicted) :
 ## -- This function can be called from any program requesting evaluation.
 ## --
  
-def evaluate(task, golddir, outfile):
+def evaluate(task, golddir, outfile, save=None):
 
     if task=="NER" :
         # get set of expected entities in the whole golddir
@@ -176,7 +188,7 @@ def evaluate(task, golddir, outfile):
     predicted = load_predicted(task, outfile)
 
     # compare both sets and compute statistics
-    print_statistics(gold,predicted)
+    print_statistics(gold,predicted, save)
          
         
 ## --
