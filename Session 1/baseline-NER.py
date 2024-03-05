@@ -101,21 +101,22 @@ trends = generate_dicts('../data/train')
 
 def classify_token(txt):
 
-   # WARNING: This function must be extended with 
-   #          more and better rules
-   # match_external = [key for key in external.keys() if txt.lower() in key]
-   num_re = re.compile(r'\-?\d{1,10}\.?\d{0,10}')
+    # WARNING: This function must be extended with 
+    #          more and better rules
+    # match_external = [key for key in external.keys() if txt.lower() in key]
+    num_re = re.compile(r'\-?\d{1,10}\.?\d{0,10}')
 
-   if txt.lower() in external : return external[txt.lower()]
-   # if match_external: return external[match_external[0]]
-   elif txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
-   elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
-   elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
-   elif txt[-5:] in trends['suffixes']['group'] : return "group"
-   # elif num_re.findall(txt): return "drug"
-   # elif txt.isupper() : return "brand"
-   # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
-   else : return "NONE"
+    if txt.lower() in external : return external[txt.lower()]
+    # if match_external: return external[match_external[0]]
+    if len(tokenize(txt))==1:
+        if txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
+        elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
+        elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
+        elif txt[-5:] in trends['suffixes']['group'] : return "group"
+    # elif num_re.findall(txt): return "drug"
+    # elif txt.isupper() : return "brand"
+    # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
+    return "NONE"
 
    
 
@@ -133,15 +134,33 @@ def extract_entities(stext) :
              
     result = []
     # classify each token and decide whether it is an entity.
-    for (token_txt, token_start, token_end)  in tokens:
-        drug_type = classify_token(token_txt)
-        
-        if drug_type != "NONE" :
+    window_max_size = 5
+    i = 0
+    while i < len(tokens):
+        drug_type = "NONE"
+        for j in range(1, 1 + window_max_size):
+            if i+j <len(tokens):
+                new_token_start = tokens[i:i+j][0][1]  # get start of first token
+                new_token_end = tokens[i:i+j][-1][2]  # get end of last token
+                multiple_token_txt = stext[new_token_start:new_token_end+1]  # glue tokens
+
+                new_drug_type = classify_token(multiple_token_txt)
+
+                if new_drug_type != "NONE": # save only the one with the most tokens
+                    k = i+j + 1
+                    token_start = new_token_start
+                    token_end = new_token_end
+                    drug_type = new_drug_type  
+
+        if drug_type != "NONE":
             e = { "offset" : str(token_start)+"-"+str(token_end),
                   "text" : stext[token_start:token_end+1],
                   "type" : drug_type
                  }
             result.append(e)
+            i = k
+        else:
+            i += 1
                     
     return result
       
