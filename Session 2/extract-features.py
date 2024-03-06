@@ -7,8 +7,48 @@ from os import listdir
 from xml.dom.minidom import parse
 from nltk.tokenize import word_tokenize
 
+from collections import Counter 
 
-   
+## dictionary containig information from external knowledge resources
+## WARNING: You may need to adjust the path to the resource files
+external = {}
+with open("../resources/HSDB.txt", encoding="utf-8") as h :
+    for x in h.readlines() :
+        external[x.strip().lower()] = "drug"
+with open("../resources/DrugBank.txt", encoding="utf-8") as h :
+    for x in h.readlines() :
+        (n,t) = x.strip().lower().split("|")
+        external[n] = t
+
+def read_entities(datadir) :
+    sentences = {}
+    # process each file in input directory
+    for f in listdir(datadir) :   
+        # parse XML file, obtaining a DOM tree
+        tree = parse(datadir+"/"+f)
+        #print(tree.getElementsByTagName("sentence")[0].attributes)
+        # process each sentence in the file
+        for sentence in tree.getElementsByTagName("entity"):
+            if not sentence.attributes['type'].value in sentences.keys():
+                sentences[sentence.attributes["type"].value] = [sentence.attributes['text'].value]
+            else:
+                sentences[sentence.attributes["type"].value].append(sentence.attributes['text'].value)
+                        
+    return sentences
+
+def generate_dicts(data_dir):
+    final_lists = {'suffixes': {}, 'prefixes':{}}
+    sentences = read_entities(data_dir)
+    final_lists['suffixes']['drug'] = [i[0] for i in Counter(word[-5:] for word in sentences['drug']).most_common(40)]
+    final_lists['suffixes']['drug_n'] = [i[0] for i in Counter(word[-5:] for word in sentences['drug_n']).most_common(7)]
+    final_lists['suffixes']['brand'] = [i[0] for i in Counter(word[-5:] for word in sentences['brand']).most_common(10)]
+    final_lists['suffixes']['group'] = [i[0] for i in Counter(word[-5:] for word in sentences['group']).most_common(70)]
+    final_lists['prefixes']['drug'] = [i[0] for i in Counter(word[:3] for word in sentences['drug']).most_common(10)]
+
+    return final_lists
+
+trends = generate_dicts('../data/train')
+
 ## --------- tokenize sentence ----------- 
 ## -- Tokenize sentence, returning tokens and span offsets
 
@@ -31,44 +71,114 @@ def tokenize(txt):
 ##  Find out whether given token is marked as part of an entity in the XML
 
 def get_tag(token, spans) :
-   (form,start,end) = token
-   for (spanS,spanE,spanT) in spans :
-      if start==spanS and end<=spanE : return "B-"+spanT
-      elif start>=spanS and end<=spanE : return "I-"+spanT
+    (form,start,end) = token
+    for (spanS,spanE,spanT) in spans :
+        if start==spanS and end<=spanE : return "B-"+spanT
+        elif start>=spanS and end<=spanE : return "I-"+spanT
 
-   return "O"
+    return "O"
+
+def f7(seq):
+    seen = set()
+    seen_add = seen.add
+    return [x for x in seq if not (x in seen or seen_add(x))]
  
 ## --------- Feature extractor ----------- 
 ## -- Extract features for each token in given sentence
+def extract_features(tokens):
+    window_size=1
 
-def extract_features(tokens) :
+    # for each token, generate list of features and add it to the result
+    result = []
+    for k in range(0, len(tokens)):
+        tokenFeatures = []
+        t = tokens[k][0]
 
-   # for each token, generate list of features and add it to the result
-   result = []
-   for k in range(0,len(tokens)):
-      tokenFeatures = [];
-      t = tokens[k][0]
+        # Basic features
+        tokenFeatures.append("form=" + t)
+        tokenFeatures.append("formlower=" + t.lower())  # Lowercased form
+        tokenFeatures.append("suf3=" + t[-3:])
+        if len(t) >= 4:
+            tokenFeatures.append("suf4=" + t[-4:])
+        if t.lower() in external : tokenFeatures.append("external=" + external[t.lower()])
+        
+        if t.istitle(): tokenFeatures.append("isTitle")  # Is Title
+        if t.isupper(): tokenFeatures.append("isUpper")  # Is Title
+        if t.islower(): tokenFeatures.append("isLower")  # Is Title
 
-      tokenFeatures.append("form="+t)
-      tokenFeatures.append("suf3="+t[-3:])
+        if t[-5:] in trends['suffixes']['drug_n']: tokenFeatures.append("trend=" + "drug_n")
+        elif t[-5:] in trends['suffixes']['drug']: tokenFeatures.append("trend=" + "drug")
+        elif t[-5:] in trends['suffixes']['brand']: tokenFeatures.append("trend=" + "brand")
+        elif t[-5:] in trends['suffixes']['group']: tokenFeatures.append("trend=" + "group")
 
-      if k>0 :
-         tPrev = tokens[k-1][0]
-         tokenFeatures.append("formPrev="+tPrev)
-         tokenFeatures.append("suf3Prev="+tPrev[-3:])
-      else :
-         tokenFeatures.append("BoS")
+        # Prefix features
+        tokenFeatures.append("pref3=" + t[:3])  # First 3 characters
+        tokenFeatures.append("pref2=" + t[:2])  # First 2 characters
+        tokenFeatures.append("pref1=" + t[:1])  # First character
 
-      if k<len(tokens)-1 :
-         tNext = tokens[k+1][0]
-         tokenFeatures.append("formNext="+tNext)
-         tokenFeatures.append("suf3Next="+tNext[-3:])
-      else:
-         tokenFeatures.append("EoS")
-    
-      result.append(tokenFeatures)
-    
-   return result
+        # BoS and EoS
+        if k==0:
+            tokenFeatures.append("BoS")
+        elif k+1==len(tokens):
+            tokenFeatures.append("EoS")
+
+        # Word shape features
+        word_shape = get_word_shape(t)
+        word_shape = str(f7(word_shape))
+        tokenFeatures.append("word_shape=" + word_shape)
+
+        # special chars - no difference
+        # if '%' in t:
+        #     tokenFeatures.append("percentage")
+        # if '/' in t:
+        #     tokenFeatures.append("slash")
+        # if '#' in t:
+        #     tokenFeatures.append("hash")
+        # if '-' in t:
+        #     tokenFeatures.append("dash")
+
+        # Context words
+
+        for i in range(1, window_size + 1):
+            if k - i >= 0:
+                tPrev = tokens[k - i][0]
+                tokenFeatures.append("formPrev" + str(i) + "=" + tPrev)
+                tokenFeatures.append("formlowerPrev" + str(i) + "=" + tPrev.lower())  # Lowercased form of previous token
+                tokenFeatures.append("suf3Prev" + str(i) + "=" + tPrev[-3:])
+                if len(tPrev) >= 4:
+                    tokenFeatures.append("suf4Prev" + str(i) + "=" + tPrev[-4:])
+                if tPrev.lower() in external : tokenFeatures.append("externalPrev"+ str(i) + "=" + external[tPrev.lower()])
+            if k - i == 0:
+                tokenFeatures.append("BoS" + str(i))
+
+            if k + i < len(tokens):
+                tNext = tokens[k + i][0]
+                tokenFeatures.append("formNext" + str(i) + "=" + tNext)
+                tokenFeatures.append("formlowerNext" + str(i) + "=" + tNext.lower())  # Lowercased form of next token
+                tokenFeatures.append("suf3Next" + str(i) + "=" + tNext[-3:])
+                if len(tNext) >= 4:
+                    tokenFeatures.append("suf4Next" + str(i) + "=" + tNext[-4:])
+                if tNext.lower() in external : tokenFeatures.append("externalNext"+ str(i) + "=" + external[tNext.lower()])
+            if k + i + 1== len(tokens):
+                tokenFeatures.append("EoS" + str(i))
+
+        result.append(tokenFeatures)
+
+    return result
+
+
+def get_word_shape(word):
+    word_shape = ""
+    for char in word:
+        if char.isupper():
+            word_shape += "X"  # Uppercase letter
+        elif char.islower():
+            word_shape += "x"  # Lowercase letter
+        elif char.isdigit():
+            word_shape += "d"  # Digit
+        # else:
+        #     word_shape += char  # Non-alphanumeric
+    return word_shape
 
 
 ## --------- MAIN PROGRAM ----------- 
@@ -86,34 +196,34 @@ datadir = sys.argv[1]
 # process each file in directory
 for f in listdir(datadir) :
    
-   # parse XML file, obtaining a DOM tree
-   tree = parse(datadir+"/"+f)
+    # parse XML file, obtaining a DOM tree
+    tree = parse(datadir+"/"+f)
    
-   # process each sentence in the file
-   sentences = tree.getElementsByTagName("sentence")
-   for s in sentences :
-      sid = s.attributes["id"].value   # get sentence id
-      spans = []
-      stext = s.attributes["text"].value   # get sentence text
-      entities = s.getElementsByTagName("entity")
-      for e in entities :
-         # for discontinuous entities, we only get the first span
-         # (will not work, but there are few of them)
-         (start,end) = e.attributes["charOffset"].value.split(";")[0].split("-")
-         typ =  e.attributes["type"].value
-         spans.append((int(start),int(end),typ))
-         
+    # process each sentence in the file
+    sentences = tree.getElementsByTagName("sentence")
+    for s in sentences :
+        sid = s.attributes["id"].value   # get sentence id
+        spans = []
+        stext = s.attributes["text"].value    # get sentence text
+        entities = s.getElementsByTagName("entity")
+        for e in entities :
+            # for discontinuous entities, we only get the first span
+            # (will not work, but there are few of them)
+            (start,end) = e.attributes["charOffset"].value.split(";")[0].split("-")
+            typ =  e.attributes["type"].value
+            spans.append((int(start),int(end),typ))
+            
 
-      # convert the sentence to a list of tokens
-      tokens = tokenize(stext)
-      # extract sentence features
-      features = extract_features(tokens)
+        # convert the sentence to a list of tokens
+        tokens = tokenize(stext)
+        # extract sentence features
+        features = extract_features(tokens)
 
-      # print features in format expected by crfsuite trainer
-      for i in range (0,len(tokens)) :
-         # see if the token is part of an entity
-         tag = get_tag(tokens[i], spans) 
-         print (sid, tokens[i][0], tokens[i][1], tokens[i][2], tag, "\t".join(features[i]), sep='\t')
+        # print features in format expected by crfsuite trainer
+        for i in range (0,len(tokens)) :
+            # see if the token is part of an entity
+            tag = get_tag(tokens[i], spans) 
+            print (sid, tokens[i][0], tokens[i][1], tokens[i][2], tag, "\t".join(features[i]), sep='\t')
 
-      # blank line to separate sentences
-      print()
+        # blank line to separate sentences
+        print()
