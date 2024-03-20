@@ -94,6 +94,9 @@ def generate_dicts(data_dir):
     final_lists['suffixes']['brand'] = [i[0] for i in Counter(word[-5:] for word in sentences['brand']).most_common(10)]
     final_lists['suffixes']['group'] = [i[0] for i in Counter(word[-5:] for word in sentences['group']).most_common(70)]
     final_lists['prefixes']['drug'] = [i[0] for i in Counter(word[:3] for word in sentences['drug']).most_common(10)]
+    final_lists['prefixes']['drug_n'] = [i[0] for i in Counter(word[:3] for word in sentences['drug_n']).most_common(10)]
+    final_lists['prefixes']['brand'] = [i[0] for i in Counter(word[:3] for word in sentences['brand']).most_common(14)]
+    final_lists['prefixes']['group'] = [i[0] for i in Counter(word[:3] for word in sentences['group']).most_common(10)]
 
     return final_lists
 
@@ -109,12 +112,15 @@ def classify_token(txt):
    if txt.lower() in external : return external[txt.lower()]
    # if match_external: return external[match_external[0]]
    elif txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
-   elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
-   elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
    elif txt[-5:] in trends['suffixes']['group'] : return "group"
-   # elif num_re.findall(txt): return "drug"
+   # elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
+   # elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
+   # elif num_re.findall(txt): return "drug_n"
    # elif txt.isupper() : return "brand"
    # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
+   # elif txt[:3] in trends['prefixes']['drug_n'] : return "drug_n"
+   elif txt[:3] in trends['prefixes']['brand'] : return "brand"
+   # elif txt[:3] in trends['prefixes']['drug'] : return "group"
    else : return "NONE"
 
    
