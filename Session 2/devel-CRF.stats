@@ -1,4 +1,4 @@
-[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-27
+[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-34
                    tp	  fp	  fn	#pred	#exp	P	R	F1
 ------------------------------------------------------------------------------
 brand               0	  87	1158	  87	1158	0.0%	0.0%	0.0%
@@ -36,4 +36,4 @@ m.avg(no class)  2423	 173	 589	2596	3012	93.3%	80.4%	86.4%
 [neptune] [info   ] Done!
 [neptune] [info   ] Waiting for the remaining 94 operations to synchronize with Neptune. Do not kill this process.
 [neptune] [info   ] All 94 operations synced, thanks for waiting!
-[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-27/metadata
+[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-34/metadata
