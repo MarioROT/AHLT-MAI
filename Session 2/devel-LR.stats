@@ -1,4 +1,26 @@
-[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-126
+[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-28
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+brand               0	  56	1158	  56	1158	0.0%	0.0%	0.0%
+drug                0	1874	7256	1874	7256	0.0%	0.0%	0.0%
+drug_n              0	   5	 527	   5	 527	0.0%	0.0%	0.0%
+group               0	 604	2686	 604	2686	0.0%	0.0%	0.0%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	0.0%	0.0%	0.0%
+------------------------------------------------------------------------------
+m.avg               0	2539	11627	2539	11627	0.0%	0.0%	0.0%
+m.avg(no class)     0	2539	11627	2539	11627	0.0%	0.0%	0.0%
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+brand               0	  56	 274	  56	 274	0.0%	0.0%	0.0%
+drug                0	1874	2127	1874	2127	0.0%	0.0%	0.0%
+drug_n              0	   5	  72	   5	  72	0.0%	0.0%	0.0%
+group               0	 604	 693	 604	 693	0.0%	0.0%	0.0%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	0.0%	0.0%	0.0%
+------------------------------------------------------------------------------
+m.avg               0	2539	3166	2539	3166	0.0%	0.0%	0.0%
+m.avg(no class)     0	2539	3166	2539	3166	0.0%	0.0%	0.0%
                    tp	  fp	  fn	#pred	#exp	P	R	F1
 ------------------------------------------------------------------------------
 brand              55	   1	 319	  56	 374	98.2%	14.7%	25.6%
@@ -12,6 +34,6 @@ m.avg            2232	 307	 780	2539	3012	87.9%	74.1%	80.4%
 m.avg(no class)  2332	 207	 680	2539	3012	91.8%	77.4%	84.0%
 [neptune] [info   ] Shutting down background jobs, please wait a moment...
 [neptune] [info   ] Done!
-[neptune] [info   ] Waiting for the remaining 39 operations to synchronize with Neptune. Do not kill this process.
-[neptune] [info   ] All 39 operations synced, thanks for waiting!
-[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-126/metadata
+[neptune] [info   ] Waiting for the remaining 94 operations to synchronize with Neptune. Do not kill this process.
+[neptune] [info   ] All 94 operations synced, thanks for waiting!
+[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-28/metadata
