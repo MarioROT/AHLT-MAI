@@ -6,7 +6,10 @@ from os import listdir
 from xml.dom.minidom import parse
 
 import pandas as pd
+import neptune
 from neptune.types import File
+from dotenv import dotenv_values
+
 
 ## --
 ## -- auxliary to insert an instance in given instance_set
@@ -137,7 +140,7 @@ def row(txt) :
    return txt + ' '*(17-len(txt))
 
 
-def print_statistics(gold,predicted, save = None):
+def print_statistics(gold,predicted, save = None, dataName = None):
     stats = {'kinds':[], 'tps':[], 'fps':[], 'fns':[], 'preds':[], 'exps':[], 'Ps':[], 'Rs':[], 'Fs':[]}
     print(row("")+"  tp\t  fp\t  fn\t#pred\t#exp\tP\tR\tF1")
     print("------------------------------------------------------------------------------")
@@ -153,6 +156,7 @@ def print_statistics(gold,predicted, save = None):
     print("------------------------------------------------------------------------------")
     [stats[key].append(["M.avg",'-','-','-','-','-',sP,sR,sF1][i]) for i, key in enumerate(stats.keys())]
     print(row("M.avg")+"-\t-\t-\t-\t-\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(sP, sR, sF1))
+    run[f'{dataName}/M.avg(Precision)'],run[f'{dataName}/M.avg(Recall)'],run[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
     
 
     print("------------------------------------------------------------------------------")
@@ -173,23 +177,40 @@ def print_statistics(gold,predicted, save = None):
 ## --
  
 def evaluate(task, golddir, outfile, save=None):
+    if save:
+        for dataName in ['train', 'devel', 'test']:
+            if task=="NER":
+                # get set of expected entities in the whole golddir
+                gold = load_gold_NER(golddir + dataName)
+            elif task == "DDI" :
+                # get set of expected relations in the whole golddir
+                gold = load_gold_DDI(golddir)
+            else :
+                print ("Invalid task '"+task+"'. Please specify 'NER' or 'DDI'.")        
 
-    if task=="NER" :
-        # get set of expected entities in the whole golddir
-        gold = load_gold_NER(golddir)
-    elif task == "DDI" :
-        # get set of expected relations in the whole golddir
-        gold = load_gold_DDI(golddir)
-    else :
-        print ("Invalid task '"+task+"'. Please specify 'NER' or 'DDI'.")        
+
+            # Load entities/relations predicted by the system
+            predicted = load_predicted(task, outfile)
+
+            # compare both sets and compute statistics
+            print_statistics(gold,predicted, save, dataName)
+    else:
+        if task=="NER":
+            # get set of expected entities in the whole golddir
+            gold = load_gold_NER(golddir)
+        elif task == "DDI" :
+            # get set of expected relations in the whole golddir
+            gold = load_gold_DDI(golddir)
+        else :
+            print ("Invalid task '"+task+"'. Please specify 'NER' or 'DDI'.")        
 
 
-    # Load entities/relations predicted by the system
-    predicted = load_predicted(task, outfile)
+        # Load entities/relations predicted by the system
+        predicted = load_predicted(task, outfile)
 
-    # compare both sets and compute statistics
-    print_statistics(gold,predicted, save)
-         
+        # compare both sets and compute statistics
+        print_statistics(gold,predicted, save)
+     
         
 ## --
 ## -- Usage as standalone program:  evaluator.py (NER|DDI) golddir outfile
@@ -200,12 +221,36 @@ def evaluate(task, golddir, outfile, save=None):
 
 if __name__ == "__main__":
 
-    if len(sys.argv) != 4 :
-        print("\n  Usage: evaluator.py (NER|DDI) golddir outfile\n")
-        exit()
-        
-    task = sys.argv[1]
-    golddir = sys.argv[2]
-    outfile = sys.argv[3]
+    # if len(sys.argv) != 4 :
+    #     print("\n  Usage: evaluator.py (NER|DDI) golddir outfile\n")
+    #     exit()
 
-    evaluate(task, golddir, outfile)
+    try:
+        use_neptune = sys.argv[4]
+    except:
+        use_neptune = None
+
+    if use_neptune:
+        config = dotenv_values("../.env")
+
+        run = neptune.init_run(
+            project="projects.mai.bcn/AHLT",
+            api_token=config['NPT_MAI_PB'],
+        )  # your credentials
+
+
+    p = {"task":sys.argv[1], "datadir": sys.argv[2], "outfile": sys.argv[3]}
+
+    if use_neptune:
+        run["parameters"] = p
+        run["results/results"].upload(p["outfile"])
+        evaluate(p['task'], p['datadir'], p['outfile'], run if use_neptune else None)
+        run.stop()
+    else:
+        # task = sys.argv[1]
+        # golddir = sys.argv[2]
+        # outfile = sys.argv[3]
+
+        # evaluate(task, golddir, outfile)
+        evaluate(p['task'], p['datadir'], p['outfile'], run if use_neptune else None)
+
