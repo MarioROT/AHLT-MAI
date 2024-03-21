@@ -217,6 +217,7 @@ nerc(p["datadir"],p["outfile"])
 if use_neptune:
     run["parameters"] = p
     run["results/results"].upload(p["outfile"])
+    print(f'pdatadirT: {"/".join(p["datadir"].split("/")[:-1]+[""])}')
     evaluator.evaluate(p["task"], '/'.join(p["datadir"].split('/')[:-1]+['']), p["outfile"], run if use_neptune else None)
     run.stop()
 else:

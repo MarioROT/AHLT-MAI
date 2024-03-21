@@ -137,7 +137,7 @@ def row(txt) :
    return txt + ' '*(17-len(txt))
 
 
-def print_statistics(gold,predicted, save = None):
+def print_statistics(gold,predicted, save = None, dataName = None):
     stats = {'kinds':[], 'tps':[], 'fps':[], 'fns':[], 'preds':[], 'exps':[], 'Ps':[], 'Rs':[], 'Fs':[]}
     print(row("")+"  tp\t  fp\t  fn\t#pred\t#exp\tP\tR\tF1")
     print("------------------------------------------------------------------------------")
@@ -153,7 +153,7 @@ def print_statistics(gold,predicted, save = None):
     print("------------------------------------------------------------------------------")
     [stats[key].append(["M.avg",'-','-','-','-','-',sP,sR,sF1][i]) for i, key in enumerate(stats.keys())]
     print(row("M.avg")+"-\t-\t-\t-\t-\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(sP, sR, sF1))
-    
+    run[f'{dataName}/M.avg(Precision)']
 
     print("------------------------------------------------------------------------------")
     (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, "CLASS")
@@ -173,24 +173,41 @@ def print_statistics(gold,predicted, save = None):
 ## --
  
 def evaluate(task, golddir, outfile, save=None):
+    print(f'goldDir: {golddir}')
+    if save:
+        for dataName in ['train', 'devel', 'test']:
+            if task=="NER":
+                # get set of expected entities in the whole golddir
+                gold = load_gold_NER(golddir + dataName)
+            elif task == "DDI" :
+                # get set of expected relations in the whole golddir
+                gold = load_gold_DDI(golddir)
+            else :
+                print ("Invalid task '"+task+"'. Please specify 'NER' or 'DDI'.")        
 
-    if task=="NER" :
-        # get set of expected entities in the whole golddir
-        gold = load_gold_NER(golddir)
-    elif task == "DDI" :
-        # get set of expected relations in the whole golddir
-        gold = load_gold_DDI(golddir)
-    else :
-        print ("Invalid task '"+task+"'. Please specify 'NER' or 'DDI'.")        
+
+            # Load entities/relations predicted by the system
+            predicted = load_predicted(task, outfile)
+
+            # compare both sets and compute statistics
+            print_statistics(gold,predicted, save, dataName)
+    else:
+        if task=="NER":
+            # get set of expected entities in the whole golddir
+            gold = load_gold_NER(golddir)
+        elif task == "DDI" :
+            # get set of expected relations in the whole golddir
+            gold = load_gold_DDI(golddir)
+        else :
+            print ("Invalid task '"+task+"'. Please specify 'NER' or 'DDI'.")        
 
 
-    # Load entities/relations predicted by the system
-    predicted = load_predicted(task, outfile)
+        # Load entities/relations predicted by the system
+        predicted = load_predicted(task, outfile)
 
-    # compare both sets and compute statistics
-    print_statistics(gold,predicted, save)
-         
-        
+        # compare both sets and compute statistics
+        print_statistics(gold,predicted, save)
+
 ## --
 ## -- Usage as standalone program:  evaluator.py (NER|DDI) golddir outfile
 ## --

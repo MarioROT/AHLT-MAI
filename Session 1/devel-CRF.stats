@@ -1,0 +1,3 @@
+
+  Usage: evaluator.py (NER|DDI) golddir outfile
+
