@@ -3,6 +3,9 @@ import sys, os
 
 from CRF import *
 from LR import *
+from SVM import *
+from RF import *
+from AB import *
 
 class ML_model:
 
@@ -23,6 +26,18 @@ class ML_model:
         elif ext == ".lrg" :
             if load : self._model = LR(modelfile)
             else : self._model = LR()
+
+        elif ext == ".svm" :
+            if load : self._model = SVM(modelfile)
+            else : self._model = SVM()
+
+        elif ext == ".rft" :
+            if load : self._model = RF(modelfile)
+            else : self._model = RF()
+
+        elif ext == ".abc" :
+            if load : self._model = AB(modelfile)
+            else : self._model = AB()
             
         else :
             print("Unknown model type",ext[1:])
