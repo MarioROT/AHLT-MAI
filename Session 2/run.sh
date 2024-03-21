@@ -32,25 +32,25 @@ BASEDIR=./
 
 # # train SVM model
 # echo "Training SVM model..."
-# python train.py train.feat model.svm 
+python train.py train.feat model.svm 
 # # run SVM model
-# echo "Running SVM model..."
-# python predict.py devel.feat model.svm > devel-SVM.out
+echo "Running SVM model..."
+python predict.py devel.feat model.svm > devel-SVM.out
 # # evaluate SVM results
-# echo "Evaluating SVM results..."
+echo "Evaluating SVM results..."
 # python ../util/evaluator.py NER ../data/devel devel-SVM.out > devel-SVM.stats
-# python ../util/evaluator.py NER ../data/ devel-SVM.out NER-ML-SVM > devel-SVM.stats
+python ../util/evaluator.py NER ../data/ devel-SVM.out NER-ML-SVM > devel-SVM.stats
 
 
 # train RF model
-echo "Training RF model..."
-python train.py train.feat model.rft 
+# echo "Training RF model..."
+# python train.py train.feat model.rft 
 # run RF model
-echo "Running RF model..."
-python predict.py devel.feat model.rft > devel-RF.out
+# echo "Running RF model..."
+# python predict.py devel.feat model.rft > devel-RF.out
 # evaluate RF results
-echo "Evaluating RF results..."
-python ../util/evaluator.py NER ../data/devel devel-RF.out > devel-RF.stats
+# echo "Evaluating RF results..."
+# python ../util/evaluator.py NER ../data/devel devel-RF.out > devel-RF.stats
 # python ../util/evaluator.py NER ../data/ devel-RF.out NER-ML-RF > devel-RF.stats
 
 # # train AdaBoost model
