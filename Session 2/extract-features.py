@@ -44,6 +44,9 @@ def generate_dicts(data_dir):
     final_lists['suffixes']['brand'] = [i[0] for i in Counter(word[-5:] for word in sentences['brand']).most_common(10)]
     final_lists['suffixes']['group'] = [i[0] for i in Counter(word[-5:] for word in sentences['group']).most_common(70)]
     final_lists['prefixes']['drug'] = [i[0] for i in Counter(word[:3] for word in sentences['drug']).most_common(10)]
+    final_lists['prefixes']['drug_n'] = [i[0] for i in Counter(word[:3] for word in sentences['drug_n']).most_common(10)]
+    final_lists['prefixes']['brand'] = [i[0] for i in Counter(word[:3] for word in sentences['brand']).most_common(14)]
+    final_lists['prefixes']['group'] = [i[0] for i in Counter(word[:3] for word in sentences['group']).most_common(10)]
 
     return final_lists
 
@@ -96,7 +99,7 @@ def extract_features(tokens):
 
         # Basic features
         tokenFeatures.append("form=" + t)
-        tokenFeatures.append("formlower=" + t.lower())  # Lowercased form
+        # tokenFeatures.append("formlower=" + t.lower())  # Lowercased form
         tokenFeatures.append("suf3=" + t[-3:])
         if len(t) >= 4:
             tokenFeatures.append("suf4=" + t[-4:])
@@ -106,10 +109,15 @@ def extract_features(tokens):
         if t.isupper(): tokenFeatures.append("isUpper")  # Is Title
         if t.islower(): tokenFeatures.append("isLower")  # Is Title
 
-        if t[-5:] in trends['suffixes']['drug_n']: tokenFeatures.append("trend=" + "drug_n")
-        elif t[-5:] in trends['suffixes']['drug']: tokenFeatures.append("trend=" + "drug")
-        elif t[-5:] in trends['suffixes']['brand']: tokenFeatures.append("trend=" + "brand")
-        elif t[-5:] in trends['suffixes']['group']: tokenFeatures.append("trend=" + "group")
+        # if t[-5:] in trends['suffixes']['drug_n']: tokenFeatures.append("trend=" + "drug_n")
+        # elif t[-5:] in trends['suffixes']['drug']: tokenFeatures.append("trend=" + "drug")
+        # elif t[-5:] in trends['suffixes']['brand']: tokenFeatures.append("trend=" + "brand")
+        # elif t[-5:] in trends['suffixes']['group']: tokenFeatures.append("trend=" + "group")
+
+        # if t[-5:] in trends['prefixes']['drug_n']: tokenFeatures.append("trend=" + "drug_n")
+        # elif t[-5:] in trends['prefixes']['drug']: tokenFeatures.append("trend=" + "drug")
+        # if t[-5:] in trends['prefixes']['brand']: tokenFeatures.append("trend=" + "brand")
+        # elif t[-5:] in trends['prefixes']['group']: tokenFeatures.append("trend=" + "group")
 
         # Prefix features
         tokenFeatures.append("pref3=" + t[:3])  # First 3 characters

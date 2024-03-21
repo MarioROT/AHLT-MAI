@@ -8,15 +8,15 @@ BASEDIR=./
 # python extract-features.py ../data/devel/ > devel.feat
 
 # # train CRF model
-# echo "Training CRF model..."
-# python train.py train.feat model.crf 
+echo "Training CRF model..."
+python train.py train.feat model.crf 
 # # run CRF model
-# echo "Running CRF model..."
-# python predict.py devel.feat model.crf > devel-CRF.out
+echo "Running CRF model..."
+python predict.py devel.feat model.crf > devel-CRF.out
 # # evaluate CRF results
-# echo "Evaluating CRF results..."
+echo "Evaluating CRF results..."
 # python ../util/evaluator.py NER ../data/devel devel-CRF.out > devel-CRF.stats
-# python ../util/evaluator.py NER ../data/ devel-CRF.out NER-ML-CRF > devel-CRF.stats
+python ../util/evaluator.py NER ../data/ devel-CRF.out NER-ML-CRF > devel-CRF.stats
 
 # # train LR model
 # echo "Training LR model..."
@@ -32,14 +32,14 @@ BASEDIR=./
 
 # # train SVM model
 # echo "Training SVM model..."
-python train.py train.feat model.svm 
+# python train.py train.feat model.svm 
 # # run SVM model
-echo "Running SVM model..."
-python predict.py devel.feat model.svm > devel-SVM.out
+# echo "Running SVM model..."
+# python predict.py devel.feat model.svm > devel-SVM.out
 # # evaluate SVM results
-echo "Evaluating SVM results..."
+# echo "Evaluating SVM results..."
 # python ../util/evaluator.py NER ../data/devel devel-SVM.out > devel-SVM.stats
-python ../util/evaluator.py NER ../data/ devel-SVM.out NER-ML-SVM > devel-SVM.stats
+# python ../util/evaluator.py NER ../data/ devel-SVM.out NER-ML-SVM > devel-SVM.stats
 
 
 # train RF model
