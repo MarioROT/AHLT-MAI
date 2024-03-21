@@ -94,6 +94,9 @@ def generate_dicts(data_dir):
     final_lists['suffixes']['brand'] = [i[0] for i in Counter(word[-5:] for word in sentences['brand']).most_common(10)]
     final_lists['suffixes']['group'] = [i[0] for i in Counter(word[-5:] for word in sentences['group']).most_common(70)]
     final_lists['prefixes']['drug'] = [i[0] for i in Counter(word[:3] for word in sentences['drug']).most_common(10)]
+    final_lists['prefixes']['drug_n'] = [i[0] for i in Counter(word[:3] for word in sentences['drug_n']).most_common(10)]
+    final_lists['prefixes']['brand'] = [i[0] for i in Counter(word[:3] for word in sentences['brand']).most_common(14)]
+    final_lists['prefixes']['group'] = [i[0] for i in Counter(word[:3] for word in sentences['group']).most_common(10)]
 
     return final_lists
 
@@ -101,23 +104,25 @@ trends = generate_dicts('../data/train')
 
 def classify_token(txt):
 
-    # WARNING: This function must be extended with 
-    #          more and better rules
-    # match_external = [key for key in external.keys() if txt.lower() in key]
-    num_re = re.compile(r'\-?\d{1,10}\.?\d{0,10}')
+   # WARNING: This function must be extended with 
+   #          more and better rules
+   # match_external = [key for key in external.keys() if txt.lower() in key]
+   num_re = re.compile(r'\-?\d{1,10}\.?\d{0,10}')
 
-    if txt.lower() in external : return external[txt.lower()]
-    # if match_external: return external[match_external[0]]
-    if len(tokenize(txt))==1:
-        if txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
-        elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
-        elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
-        elif txt[-5:] in trends['suffixes']['group'] : return "group"
-    # elif num_re.findall(txt): return "drug"
-    # elif txt.isupper() : return "brand"
-    # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
-    return "NONE"
-
+   if txt.lower() in external : return external[txt.lower()]
+   # if match_external: return external[match_external[0]]
+   if len(tokenize(txt))==1:
+       if txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
+       elif txt[-5:] in trends['suffixes']['group'] : return "group"
+       # elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
+       # elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
+       # elif num_re.findall(txt): return "drug_n"
+       # elif txt.isupper() : return "brand"
+       # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
+       # elif txt[:3] in trends['prefixes']['drug_n'] : return "drug_n"
+       elif txt[:3] in trends['prefixes']['brand'] : return "brand"
+       # elif txt[:3] in trends['prefixes']['drug'] : return "group"
+   return "NONE"
    
 
 ## --------- Entity extractor ----------- 
