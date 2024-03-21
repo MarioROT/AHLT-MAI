@@ -16,6 +16,7 @@ BASEDIR=./
 # # evaluate CRF results
 # echo "Evaluating CRF results..."
 # python ../util/evaluator.py NER ../data/devel devel-CRF.out > devel-CRF.stats
+# python ../util/evaluator.py NER ../data/ devel-CRF.out NER-ML-CRF > devel-CRF.stats
 
 # # train LR model
 # echo "Training LR model..."
@@ -26,7 +27,7 @@ BASEDIR=./
 # # evaluate LR results
 # echo "Evaluating LR results..."
 # python ../util/evaluator.py NER ../data/devel devel-LR.out > devel-LR.stats
-
+# python ../util/evaluator.py NER ../data/ devel-LR.out NER-ML-LR > devel-LR.stats
 
 
 # # train SVM model
@@ -38,6 +39,7 @@ BASEDIR=./
 # # evaluate SVM results
 # echo "Evaluating SVM results..."
 # python ../util/evaluator.py NER ../data/devel devel-SVM.out > devel-SVM.stats
+# python ../util/evaluator.py NER ../data/ devel-SVM.out NER-ML-SVM > devel-SVM.stats
 
 
 # train RF model
