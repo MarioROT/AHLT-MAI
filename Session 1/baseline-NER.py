@@ -101,6 +101,7 @@ def generate_dicts(data_dir):
     return final_lists
 
 trends = generate_dicts('../data/train')
+suffixes = ['azole', 'idine', 'amine', 'mycin']
 
 def classify_token(txt):
 
@@ -111,15 +112,16 @@ def classify_token(txt):
 
    if txt.lower() in external : return external[txt.lower()]
    # if match_external: return external[match_external[0]]
-   elif txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
-   elif txt[-5:] in trends['suffixes']['group'] : return "group"
+   # elif txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
+   # elif txt[-5:] in trends['suffixes']['group'] : return "group"
    # elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
    # elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
    # elif num_re.findall(txt): return "drug_n"
-   # elif txt.isupper() : return "brand"
+   elif txt.isupper() : return "brand"
    # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
    # elif txt[:3] in trends['prefixes']['drug_n'] : return "drug_n"
-   elif txt[:3] in trends['prefixes']['brand'] : return "brand"
+   # elif txt[:3] in trends['prefixes']['brand'] : return "brand"
+   elif txt[-5:] in suffixes : return "drug"
    # elif txt[:3] in trends['prefixes']['drug'] : return "group"
    else : return "NONE"
 
@@ -215,8 +217,8 @@ nerc(p["datadir"],p["outfile"])
 if use_neptune:
     run["parameters"] = p
     run["results/results"].upload(p["outfile"])
-
-evaluator.evaluate(p["task"], p["datadir"], p["outfile"], run if use_neptune else None)
-
-if use_neptune:
+    evaluator.evaluate(p["task"], '/'.join(p["datadir"].split('/')[:-1]+['']), p["outfile"], run if use_neptune else None)
     run.stop()
+else:
+    evaluator.evaluate(p["task"], p["datadir"], p["outfile"], run if use_neptune else None)
+
