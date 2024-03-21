@@ -6,7 +6,9 @@ from os import listdir
 from xml.dom.minidom import parse
 
 import pandas as pd
+import neptune
 from neptune.types import File
+from dotenv import dotenv_values
 
 ## --
 ## -- auxliary to insert an instance in given instance_set
