@@ -130,17 +130,18 @@ def classify_token(txt):
 ## -- a list of dictionaries with keys "offset", "text", and "type"
 
 def extract_entities(stext) :
-
-    # WARNING: This function must be extended to
-    #          deal with multi-token entities.
     
     # tokenize text
     tokens = tokenize(stext)
              
     result = []
-    # classify each token and decide whether it is an entity.
+    
+
+    # how many tokens should be checked starting from actual one
+    # e.g. windows_max_size = 5, check token 0, then token 0+1, then token 0+1+2 ... token 0+1+2+3+4
     window_max_size = 5
     i = 0
+    # for each token
     while i < len(tokens):
         drug_type = "NONE"
         for j in range(1, 1 + window_max_size):
@@ -149,7 +150,7 @@ def extract_entities(stext) :
                 new_token_end = tokens[i:i+j][-1][2]  # get end of last token
                 multiple_token_txt = stext[new_token_start:new_token_end+1]  # glue tokens
 
-                new_drug_type = classify_token(multiple_token_txt)
+                new_drug_type = classify_token(multiple_token_txt) # classify token(s)
 
                 if new_drug_type != "NONE": # save only the one with the most tokens
                     k = i+j + 1
