@@ -1,0 +1,17 @@
+[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-126
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+brand              55	   1	 319	  56	 374	98.2%	14.7%	25.6%
+drug             1675	 199	 231	1874	1906	89.4%	87.9%	88.6%
+drug_n              1	   4	  44	   5	  45	20.0%	2.2%	4.0%
+group             501	 103	 186	 604	 687	82.9%	72.9%	77.6%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	72.6%	44.4%	49.0%
+------------------------------------------------------------------------------
+m.avg            2232	 307	 780	2539	3012	87.9%	74.1%	80.4%
+m.avg(no class)  2332	 207	 680	2539	3012	91.8%	77.4%	84.0%
+[neptune] [info   ] Shutting down background jobs, please wait a moment...
+[neptune] [info   ] Done!
+[neptune] [info   ] Waiting for the remaining 39 operations to synchronize with Neptune. Do not kill this process.
+[neptune] [info   ] All 39 operations synced, thanks for waiting!
+[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-126/metadata
