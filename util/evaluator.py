@@ -153,7 +153,7 @@ def print_statistics(gold,predicted, save = None, dataName = None):
     print("------------------------------------------------------------------------------")
     [stats[key].append(["M.avg",'-','-','-','-','-',sP,sR,sF1][i]) for i, key in enumerate(stats.keys())]
     print(row("M.avg")+"-\t-\t-\t-\t-\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(sP, sR, sF1))
-    run[f'{dataName}/M.avg(Precision)']
+    save[f'{dataName}/M.avg(Precision)'],save[f'{dataName}/M.avg(Recall)'],save[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
 
     print("------------------------------------------------------------------------------")
     (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, "CLASS")
@@ -173,9 +173,8 @@ def print_statistics(gold,predicted, save = None, dataName = None):
 ## --
  
 def evaluate(task, golddir, outfile, save=None):
-    print(f'goldDir: {golddir}')
     if save:
-        for dataName in ['train', 'devel', 'test']:
+        for dataName in ['train', 'test', 'devel']:
             if task=="NER":
                 # get set of expected entities in the whole golddir
                 gold = load_gold_NER(golddir + dataName)
