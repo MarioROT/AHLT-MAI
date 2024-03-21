@@ -222,6 +222,7 @@ if use_neptune:
     run = neptune.init_run(
         project="projects.mai.bcn/AHLT",
         api_token=config['NPT_MAI_PB'],
+        tags=['NERC', 'baseline-NER']
     )  # your credentials
 
 # directory with files to process

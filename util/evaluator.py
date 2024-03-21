@@ -156,8 +156,7 @@ def print_statistics(gold,predicted, save = None, dataName = None):
     print("------------------------------------------------------------------------------")
     [stats[key].append(["M.avg",'-','-','-','-','-',sP,sR,sF1][i]) for i, key in enumerate(stats.keys())]
     print(row("M.avg")+"-\t-\t-\t-\t-\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(sP, sR, sF1))
-    run[f'{dataName}/M.avg(Precision)'],run[f'{dataName}/M.avg(Recall)'],run[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
-    
+    save[f'{dataName}/M.avg(Precision)'],save[f'{dataName}/M.avg(Recall)'],save[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
 
     print("------------------------------------------------------------------------------")
     (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, "CLASS")
@@ -178,7 +177,7 @@ def print_statistics(gold,predicted, save = None, dataName = None):
  
 def evaluate(task, golddir, outfile, save=None):
     if save:
-        for dataName in ['train', 'devel', 'test']:
+        for dataName in ['train', 'test', 'devel']:
             if task=="NER":
                 # get set of expected entities in the whole golddir
                 gold = load_gold_NER(golddir + dataName)
@@ -224,6 +223,8 @@ if __name__ == "__main__":
     # if len(sys.argv) != 4 :
     #     print("\n  Usage: evaluator.py (NER|DDI) golddir outfile\n")
     #     exit()
+    
+    p = {"task":sys.argv[1], "datadir": sys.argv[2], "outfile": sys.argv[3]}
 
     try:
         use_neptune = sys.argv[4]
@@ -236,10 +237,9 @@ if __name__ == "__main__":
         run = neptune.init_run(
             project="projects.mai.bcn/AHLT",
             api_token=config['NPT_MAI_PB'],
+            tags=['NERC', use_neptune]
         )  # your credentials
 
-
-    p = {"task":sys.argv[1], "datadir": sys.argv[2], "outfile": sys.argv[3]}
 
     if use_neptune:
         run["parameters"] = p
