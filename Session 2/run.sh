@@ -51,6 +51,7 @@ python predict.py devel.feat model.rft > devel-RF.out
 # evaluate RF results
 echo "Evaluating RF results..."
 python ../util/evaluator.py NER ../data/devel devel-RF.out > devel-RF.stats
+# python ../util/evaluator.py NER ../data/ devel-RF.out NER-ML-RF > devel-RF.stats
 
 # # train AdaBoost model
 # echo "Training AdaBoost model..."
