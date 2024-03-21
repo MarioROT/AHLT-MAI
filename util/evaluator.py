@@ -243,6 +243,8 @@ if __name__ == "__main__":
     if use_neptune:
         run["parameters"] = p
         run["results/results"].upload(p["outfile"])
+        if use_neptune in ['NER-ML']:
+            run['files/extracted-features'].upload('../Session 2/extract-features.py')
         evaluate(p['task'], p['datadir'], p['outfile'], run if use_neptune else None)
         run.stop()
     else:
