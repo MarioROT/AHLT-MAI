@@ -112,16 +112,16 @@ def classify_token(txt):
 
    if txt.lower() in external : return external[txt.lower()]
    # if match_external: return external[match_external[0]]
-   # elif txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
-   # elif txt[-5:] in trends['suffixes']['group'] : return "group"
+   elif txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
+   elif txt[-5:] in trends['suffixes']['group'] : return "group"
    # elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
    # elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
    # elif num_re.findall(txt): return "drug_n"
-   elif txt.isupper() : return "brand"
+   # elif txt.isupper() : return "brand"
+   # elif txt[-5:] in suffixes : return "drug"
    # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
    # elif txt[:3] in trends['prefixes']['drug_n'] : return "drug_n"
-   # elif txt[:3] in trends['prefixes']['brand'] : return "brand"
-   elif txt[-5:] in suffixes : return "drug"
+   elif txt[:3] in trends['prefixes']['brand'] : return "brand"
    # elif txt[:3] in trends['prefixes']['drug'] : return "group"
    else : return "NONE"
 
