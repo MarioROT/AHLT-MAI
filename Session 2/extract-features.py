@@ -84,7 +84,8 @@ def get_tag(token, spans) :
 
     return "O"
 
-def f7(seq):
+def get_unique_in_order(seq):
+    # get unique chars in the original order
     seen = set()
     seen_add = seen.add
     return [x for x in seq if not (x in seen or seen_add(x))]
@@ -153,7 +154,7 @@ def extract_features(tokens):
 
         # Word shape features
         word_shape = get_word_shape(t)
-        word_shape = str(f7(word_shape))
+        word_shape = str(get_unique_in_order(word_shape))
         tokenFeatures.append("word_shape=" + word_shape)
 
         # special chars - no difference
