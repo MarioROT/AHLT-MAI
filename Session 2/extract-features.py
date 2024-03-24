@@ -211,12 +211,11 @@ def extract_features(tokens):
         # # POS Tagging feature
         # tokenFeatures.append("POS=" + pos_tag)
 
-        # # Character N-Grams (2-grams as example)
+        # # Character N-Grams 
         # char_ngrams = [t[i:i+2] for i in range(len(t)-1)]
         # for ngram in char_ngrams:
         #     tokenFeatures.append("char_ngram=" + ngram)
 
-        # # Orthographic features
         # if any(char.isupper() for char in t[1:]):
         #     tokenFeatures.append("internalUpper")
         if any(char.isdigit() for char in t):

@@ -45,7 +45,7 @@ class AB:
         # print(Y)
 
 
-        self.tagger = make_pipeline(AdaBoostClassifier(algorithm="SAMME", random_state=42), 
+        self.tagger = make_pipeline(AdaBoostClassifier(algorithm="SAMME"), 
                                     verbose=True)
         self.tagger.fit(X,Y)
 
