@@ -9,6 +9,9 @@ from nltk.tokenize import word_tokenize
 
 from collections import Counter 
 
+import nltk
+nltk.download('averaged_perceptron_tagger')
+
 ## dictionary containig information from external knowledge resources
 ## WARNING: You may need to adjust the path to the resource files
 external = {}
@@ -85,21 +88,39 @@ def f7(seq):
     seen = set()
     seen_add = seen.add
     return [x for x in seq if not (x in seen or seen_add(x))]
- 
+
+def get_vowel_to_consonant_ratio(word):
+    vowels = "aeiou"
+    vowel_count = sum(1 for char in word if char in vowels)
+    consonant_count = sum(1 for char in word if char.isalpha() and char not in vowels)
+    if consonant_count == 0:
+        return 0
+    return vowel_count / consonant_count
+
+
+def is_chemical_name(token):
+    chemical_suffixes = ['ium', 'ine', 'ide', 'ate', 'ite', 'ogen', 'acid']
+    # Simple heuristic - you could use a more sophisticated check
+    return any(token.lower().endswith(suffix) for suffix in chemical_suffixes)
+
+
 ## --------- Feature extractor ----------- 
 ## -- Extract features for each token in given sentence
 def extract_features(tokens):
     window_size=1
+
+    nltk_pos_tags = nltk.pos_tag([token[0] for token in tokens])
 
     # for each token, generate list of features and add it to the result
     result = []
     for k in range(0, len(tokens)):
         tokenFeatures = []
         t = tokens[k][0]
+        pos_tag = nltk_pos_tags[k][1]
 
         # Basic features
         tokenFeatures.append("form=" + t)
-        # tokenFeatures.append("formlower=" + t.lower())  # Lowercased form
+        tokenFeatures.append("formlower=" + t.lower())  # Lowercased form
         tokenFeatures.append("suf3=" + t[-3:])
         if len(t) >= 4:
             tokenFeatures.append("suf4=" + t[-4:])
@@ -109,15 +130,15 @@ def extract_features(tokens):
         if t.isupper(): tokenFeatures.append("isUpper")  # Is Title
         if t.islower(): tokenFeatures.append("isLower")  # Is Title
 
-        # if t[-5:] in trends['suffixes']['drug_n']: tokenFeatures.append("trend=" + "drug_n")
-        # elif t[-5:] in trends['suffixes']['drug']: tokenFeatures.append("trend=" + "drug")
-        # elif t[-5:] in trends['suffixes']['brand']: tokenFeatures.append("trend=" + "brand")
-        # elif t[-5:] in trends['suffixes']['group']: tokenFeatures.append("trend=" + "group")
+        if t[-5:] in trends['suffixes']['drug_n']: tokenFeatures.append("trend=" + "drug_n")
+        elif t[-5:] in trends['suffixes']['drug']: tokenFeatures.append("trend=" + "drug")
+        elif t[-5:] in trends['suffixes']['brand']: tokenFeatures.append("trend=" + "brand")
+        elif t[-5:] in trends['suffixes']['group']: tokenFeatures.append("trend=" + "group")
 
-        # if t[-5:] in trends['prefixes']['drug_n']: tokenFeatures.append("trend=" + "drug_n")
-        # elif t[-5:] in trends['prefixes']['drug']: tokenFeatures.append("trend=" + "drug")
-        # if t[-5:] in trends['prefixes']['brand']: tokenFeatures.append("trend=" + "brand")
-        # elif t[-5:] in trends['prefixes']['group']: tokenFeatures.append("trend=" + "group")
+        if t[-5:] in trends['prefixes']['drug_n']: tokenFeatures.append("trend=" + "drug_n")
+        elif t[-5:] in trends['prefixes']['drug']: tokenFeatures.append("trend=" + "drug")
+        if t[-5:] in trends['prefixes']['brand']: tokenFeatures.append("trend=" + "brand")
+        elif t[-5:] in trends['prefixes']['group']: tokenFeatures.append("trend=" + "group")
 
         # Prefix features
         tokenFeatures.append("pref3=" + t[:3])  # First 3 characters
@@ -136,14 +157,70 @@ def extract_features(tokens):
         tokenFeatures.append("word_shape=" + word_shape)
 
         # special chars - no difference
-        # if '%' in t:
-        #     tokenFeatures.append("percentage")
-        # if '/' in t:
-        #     tokenFeatures.append("slash")
-        # if '#' in t:
-        #     tokenFeatures.append("hash")
-        # if '-' in t:
-        #     tokenFeatures.append("dash")
+        if '%' in t:
+            tokenFeatures.append("percentage")
+        if '/' in t:
+            tokenFeatures.append("slash")
+        if '#' in t:
+            tokenFeatures.append("hash")
+        if '-' in t:
+            tokenFeatures.append("dash")
+
+        if any(sub in t.lower() for sub in ['alpha', 'beta', 'gamma']):
+            tokenFeatures.append('hasChemicalModifier')     
+
+        # for i in range(1, min(6, len(t)+1)):
+        #     tokenFeatures.append(f"prefix{i}={t[:i]}")
+        #     tokenFeatures.append(f"suffix{i}={t[-i:]}")
+
+        # if re.search(r'\d', t):  # Contains a digit
+        #     tokenFeatures.append("containsDigit")
+        # if re.search(r'[A-Za-z]+\d+', t):  # Letter(s) followed by digit(s)
+        #     tokenFeatures.append("letterFollowedByDigit")
+        # if re.search(r'\(', t) or re.search(r'\)', t):  # Contains parentheses
+        #     tokenFeatures.append("containsParentheses")
+
+        # if t.isupper():
+        #     tokenFeatures.append("allCaps")
+        # elif t[0].isupper() and t[1:].islower():
+        #     tokenFeatures.append("initCap")
+        # elif any(char.isupper() for char in t[1:]):
+        #     tokenFeatures.append("innerCap")
+
+        # if is_chemical_name(t):
+        #     tokenFeatures.append('isChemicalName')
+
+        # Orthographic features
+        # tokenFeatures.append("isTitle=" + str(t.istitle()))
+        # tokenFeatures.append("isLower=" + str(t.islower()))
+        # tokenFeatures.append("hasDigit=" + str(any(char.isdigit() for char in t)))
+        tokenFeatures.append("hasDash=" + str('-' in t))
+        tokenFeatures.append("hasSpecial=" + str(any(not char.isalnum() and char != '-' for char in t)))
+
+        # # Token length
+        tokenFeatures.append("length=" + str(len(t)))
+        # if len(t) > 16: tokenFeatures.append("length=12")
+
+        # tokenFeatures.append('numCaps={}'.format(sum(1 for char in t if char.isupper())))
+        # tokenFeatures.append('numSpecialChars={}'.format(sum(1 for char in t if not char.isalnum())))
+
+        # # Vowel-to-consonant ratio
+        # vcr = get_vowel_to_consonant_ratio(t)
+        # tokenFeatures.append("vowelConsonantRatio=" + str(vcr))
+
+        # # POS Tagging feature
+        # tokenFeatures.append("POS=" + pos_tag)
+
+        # # Character N-Grams (2-grams as example)
+        # char_ngrams = [t[i:i+2] for i in range(len(t)-1)]
+        # for ngram in char_ngrams:
+        #     tokenFeatures.append("char_ngram=" + ngram)
+
+        # # Orthographic features
+        # if any(char.isupper() for char in t[1:]):
+        #     tokenFeatures.append("internalUpper")
+        if any(char.isdigit() for char in t):
+            tokenFeatures.append("hasDigit")
 
         # Context words
 

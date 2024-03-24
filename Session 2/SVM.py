@@ -8,7 +8,7 @@ import scipy
 import sklearn
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler
+from sklearn.preprocessing import MaxAbsScaler, MinMaxScaler, StandardScaler, LabelEncoder
 
 import dataset
 
@@ -40,6 +40,10 @@ class SVM:
 
         # Read training instances 
         X,Y = ds.csr_matrix()
+        # label_encoder = LabelEncoder()
+        # Y = label_encoder.fit_transform(Y)
+        # print(Y)
+
 
         # print(X.toarray())
         # print(Y)

@@ -4,8 +4,8 @@ BASEDIR=./
 
 # # convert datasets to feature vectors
 # echo "Extracting features..."
-# python extract-features.py ../data/train/ > train.feat
-# python extract-features.py ../data/devel/ > devel.feat
+python extract-features.py ../data/train/ > train.feat
+python extract-features.py ../data/devel/ > devel.feat
 
 # # train CRF model
 echo "Training CRF model..."
@@ -15,8 +15,8 @@ echo "Running CRF model..."
 python predict.py devel.feat model.crf > devel-CRF.out
 # # evaluate CRF results
 echo "Evaluating CRF results..."
-# python ../util/evaluator.py NER ../data/devel devel-CRF.out > devel-CRF.stats
-python ../util/evaluator.py NER ../data/ devel-CRF.out NER-ML-CRF > devel-CRF.stats
+python ../util/evaluator.py NER ../data/devel devel-CRF.out > devel-CRF.stats
+# python ../util/evaluator.py NER ../data/ devel-CRF.out NER-ML-CRF > devel-CRF.stats
 
 # # train LR model
 # echo "Training LR model..."

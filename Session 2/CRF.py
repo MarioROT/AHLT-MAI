@@ -39,7 +39,13 @@ class CRF:
         # set parameters
         trainer.select('l2sgd', 'crf1d') # Use L2-regularized SGD and 1st-order dyad features.
         trainer.set('feature.minfreq', 1) # mininum frequecy of a feature to consider it
-        trainer.set('c2', 0.01)            # coefficient for L2 regularization
+        trainer.set('c2', 0.0625)            # coefficient for L2 regularization
+        trainer.set('feature.possible_transitions', True)
+        trainer.set('feature.possible_states', True)
+        # trainer.set('max_linesearch', 15)
+        # trainer.set('period', 13)
+        # trainer.set('gama', 1e-07)
+        # print('-------> Params  ' ,trainer.get_params())
         
         print("Training with following parameters: ", file=sys.stderr)
         for name in trainer.params():
