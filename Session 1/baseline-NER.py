@@ -101,11 +101,12 @@ def generate_dicts(data_dir):
     return final_lists
 
 trends = generate_dicts('../data/train')
+suffixes = ['azole', 'idine', 'amine', 'mycin']
 
 def classify_token(txt):
 
     # match_external = [key for key in external.keys() if txt.lower() in key]
-    # num_re = re.compile(r'\-?\d{1,10}\.?\d{0,10}') # Numbers regex rule
+    num_re = re.compile(r'\-?\d{1,10}\.?\d{0,10}') # Numbers regex rule
 
     if txt.lower() in external : return external[txt.lower()]
     # if match_external: return external[match_external[0]]
