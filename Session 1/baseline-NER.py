@@ -17,7 +17,7 @@ from collections import Counter
 
 import string
 import nltk
-nltk.download('stopwords')
+# nltk.download('stopwords')
 
 ## dictionary containig information from external knowledge resources
 ## WARNING: You may need to adjust the path to the resource files
@@ -104,25 +104,23 @@ trends = generate_dicts('../data/train')
 
 def classify_token(txt):
 
-   # WARNING: This function must be extended with 
-   #          more and better rules
-   # match_external = [key for key in external.keys() if txt.lower() in key]
-   num_re = re.compile(r'\-?\d{1,10}\.?\d{0,10}')
+    # match_external = [key for key in external.keys() if txt.lower() in key]
+    # num_re = re.compile(r'\-?\d{1,10}\.?\d{0,10}') # Numbers regex rule
 
-   if txt.lower() in external : return external[txt.lower()]
-   # if match_external: return external[match_external[0]]
-   if len(tokenize(txt))==1:
-       if txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
-       elif txt[-5:] in trends['suffixes']['group'] : return "group"
-       # elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
-       # elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
-       # elif num_re.findall(txt): return "drug_n"
-       # elif txt.isupper() : return "brand"
-       # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
-       # elif txt[:3] in trends['prefixes']['drug_n'] : return "drug_n"
-       elif txt[:3] in trends['prefixes']['brand'] : return "brand"
-       # elif txt[:3] in trends['prefixes']['drug'] : return "group"
-   return "NONE"
+    if txt.lower() in external : return external[txt.lower()]
+    # if match_external: return external[match_external[0]]
+    if len(tokenize(txt))==1:
+        if txt[-5:] in trends['suffixes']['drug_n'] : return "drug_n"
+        elif txt[-5:] in trends['suffixes']['group'] : return "group"
+        # elif txt[-5:] in trends['suffixes']['drug'] : return "drug"
+        # elif txt[-5:] in trends['suffixes']['brand'] : return "brand"
+        # elif num_re.findall(txt): return "drug_n"
+        # elif txt.isupper() : return "brand"
+        # elif txt[:3] in trends['prefixes']['drug'] : return "drug"
+        # elif txt[:3] in trends['prefixes']['drug_n'] : return "drug_n"
+        elif txt[:3] in trends['prefixes']['brand'] : return "brand"
+        # elif txt[:3] in trends['prefixes']['drug'] : return "group"
+    return "NONE"
    
 
 ## --------- Entity extractor ----------- 
@@ -136,7 +134,6 @@ def extract_entities(stext) :
              
     result = []
     
-
     # how many tokens should be checked starting from actual one
     # e.g. windows_max_size = 5, check token 0, then token 0+1, then token 0+1+2 ... token 0+1+2+3+4
     window_max_size = 5
@@ -227,8 +224,6 @@ if use_neptune:
     )  # your credentials
 
 # directory with files to process
-# datadir = sys.argv[1]
-# outfile = sys.argv[2]
 p = {"task":"NER", "datadir": sys.argv[1], "outfile": sys.argv[2]}
 nerc(p["datadir"],p["outfile"])
 

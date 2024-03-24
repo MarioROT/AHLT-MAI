@@ -156,7 +156,8 @@ def print_statistics(gold,predicted, save = None, dataName = None):
     print("------------------------------------------------------------------------------")
     [stats[key].append(["M.avg",'-','-','-','-','-',sP,sR,sF1][i]) for i, key in enumerate(stats.keys())]
     print(row("M.avg")+"-\t-\t-\t-\t-\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(sP, sR, sF1))
-    save[f'{dataName}/M.avg(Precision)'],save[f'{dataName}/M.avg(Recall)'],save[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
+    if save:
+        save[f'{dataName}/M.avg(Precision)'],save[f'{dataName}/M.avg(Recall)'],save[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
 
     print("------------------------------------------------------------------------------")
     (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, "CLASS")
