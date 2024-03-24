@@ -10,6 +10,7 @@ import neptune
 from neptune.types import File
 from dotenv import dotenv_values
 
+
 ## --
 ## -- auxliary to insert an instance in given instance_set
 ## --
@@ -155,7 +156,6 @@ def print_statistics(gold,predicted, save = None, dataName = None):
     print("------------------------------------------------------------------------------")
     [stats[key].append(["M.avg",'-','-','-','-','-',sP,sR,sF1][i]) for i, key in enumerate(stats.keys())]
     print(row("M.avg")+"-\t-\t-\t-\t-\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(sP, sR, sF1))
-    save[f'{dataName}/M.avg(Precision)'],save[f'{dataName}/M.avg(Recall)'],save[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
 
     print("------------------------------------------------------------------------------")
     (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, "CLASS")
@@ -167,6 +167,7 @@ def print_statistics(gold,predicted, save = None, dataName = None):
 
     if save:
         save["results/performance"].upload(File.as_html(pd.DataFrame(stats)))
+        save[f'{dataName}/M.avg(Precision)'],save[f'{dataName}/M.avg(Recall)'],save[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
 
 ## --
 ## -- Evaluates results in outfile comparing them with gold standard in golddir.
@@ -243,8 +244,8 @@ if __name__ == "__main__":
     if use_neptune:
         run["parameters"] = p
         run["results/results"].upload(p["outfile"])
-        if use_neptune in ['NER-ML']:
-            run['files/extracted-features'].upload('../Session 2/extract-features.py')
+        if any([i in use_neptune for i in ['NER-ML']]):
+            run['files/extract-features'].upload('../Session 2/extract-features.py')
         evaluate(p['task'], p['datadir'], p['outfile'], run if use_neptune else None)
         run.stop()
     else:
@@ -254,3 +255,4 @@ if __name__ == "__main__":
 
         # evaluate(task, golddir, outfile)
         evaluate(p['task'], p['datadir'], p['outfile'], run if use_neptune else None)
+
