@@ -1,0 +1,6 @@
+java -mx4g -cp "*" edu.stanford.nlp.pipeline.StanfordCoreNLPServer -port=9000 -timeout=15000
+
+python .\baseline-DDI.py ..\data\devel\ output.test > output.stats.v1
+
+if we have ddi and not match - bad precision
+no ddi and match  bad recall
