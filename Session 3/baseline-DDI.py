@@ -4,10 +4,12 @@ import sys
 import re
 from os import listdir
 
-from xml.dom.minidom import parse
-import evaluator
+sys.path.append('../')
 
-from deptree import *
+from xml.dom.minidom import parse
+import util.evaluator as evaluator
+
+from util.deptree import *
 import patterns
 
 
