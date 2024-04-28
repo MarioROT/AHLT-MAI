@@ -69,7 +69,7 @@ def check_pattern_wib(tree,entities,e1,e2):
 
 
 # directory with files to process
-datadir = sys.argv[1]
+datadir = "../data/devel/" # sys.argv[1]
 
 countMT = {"mechanism":0, "effect":0, "int":0, "advise":0, "null":0}
 countPT = {}
@@ -120,6 +120,9 @@ for f in listdir(datadir) :
          
          #match = check_pattern_wib(analysis, entities, id_e1, id_e2)
          #match = check_my_other_pattern(analysis, entities, id_e1, id_e2)
+         # match = check_collocation(analysis, entities, id_e1, id_e2)
+         # match = check_svo_interaction(analysis, entities, id_e1, id_e2)
+         # match = check_conjunction_interaction(analysis, entities, id_e1, id_e2)
          ####################################################
          match = []
          
@@ -161,4 +164,5 @@ else:
       for t in countMT:
          k = m+"#"+t 
          if k in countPT:
+            # if countPT[k]/countP[m]>0.5 and t == "mechanism":
             print(f"P({t}|{m}) = {countPT[k]}/{countP[m]} = {countPT[k]/countP[m]}")

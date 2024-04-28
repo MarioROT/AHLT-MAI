@@ -29,6 +29,11 @@ def check_interaction(tree, entities, e1, e2) :
    if p is not None: return p
 
    ## add more patterns to improve performance
+   p = patterns.check_lcs_verb_with_should(tree,tkE1,tkE2)
+   if p is not None: return p
+
+   p = patterns.check_verbs_after_and(tree,tkE1,tkE2)
+   if p is not None: return p
    # p = patterns.check_XXXX(tree,tkE1,tkE2,...)
    # if p is not None: return p
 
