@@ -3,10 +3,11 @@
 import sys
 import re
 from os import listdir
+sys.path.append('../')
 
 from xml.dom.minidom import parse
 
-from deptree import *
+from util.deptree import *
 
 
 # -----------------
