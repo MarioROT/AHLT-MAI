@@ -4,6 +4,7 @@ import sys, os
 
 from MEM import *
 from SVM import *
+from AB import *
 
 class ML_model:
 
@@ -20,11 +21,13 @@ class ML_model:
             # only modelfile given, load it            
             if ext == ".mem" : self._model = MEM(modelfile)
             elif ext == ".svm" : self._model = SVM(modelfile)
+            elif ext == ".abc" : self._model = AB(modelfile)
 
         else :
             # params given, create a new empty model
             if ext == ".mem" : self._model = MEM(modelfile, params)
             elif ext == ".svm" : self._model = SVM(modelfile, params)
+            elif ext == ".abc" : self._model = AB(modelfile, params)
         
         
 
