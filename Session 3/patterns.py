@@ -29,8 +29,10 @@ def check_LCS_svo(tree,tkE1,tkE2):
    return None
 
 def check_lcs_verb_with_should(tree,tkE1,tkE2):
-    # Get the head nodes for each entity
-    
+    """
+    checking if the lowest common subsumer of two drug entities in a dependency tree 
+    is a verb associated with modal verbs like "should"
+    """    
     if tkE1 is not None and tkE2 is not None:
         # Find the lowest common subsumer (LCS) between the two entities
         lcs = tree.get_LCS(tkE1, tkE2)

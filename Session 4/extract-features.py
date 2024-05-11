@@ -131,6 +131,24 @@ def extract_features(tree, entities, e1, e2, verb_list):
       full_path = path1 + "<" + lcs_lemma + "_" + tree.get_rel(lcs) + ">" + path2  
       feats.add("full_path=" + full_path)
 
+      lemma = patterns.check_LCS_svo(tree,tkE1,tkE2)
+      if lemma is not None:
+         feats.add("LCS_svo="+lemma)
+
+      lemma = patterns.check_wib(tree,tkE1,tkE2, entities, e1, e2)
+      if lemma is not None:
+         feats.add("wib="+lemma)
+
+      ## no improvement
+      # lemma = patterns.check_lcs_verb_with_should(tree,tkE1,tkE2)
+      # if lemma is not None:
+      #    feats.add("verb_like_should="+lemma)
+
+      ## no improvement
+      # lemma = patterns.check_verbs_after_and(tree,tkE1,tkE2)
+      # if lemma is not None:
+      #    feats.add("verb_after_and="+lemma)
+
    return feats
 
 
