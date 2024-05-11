@@ -94,3 +94,28 @@ ddi(datadir,outfile)
 
 evaluator.evaluate("DDI", datadir, outfile)
 
+try:
+    use_neptune = sys.argv[3]
+except:
+    use_neptune = None
+
+if use_neptune:
+    config = dotenv_values("../.env")
+
+    run = neptune.init_run(
+        project="projects.mai.bcn/AHLT",
+        api_token=config['NPT_MAI_PB'],
+        tags=['NERC', 'baseline-NER']
+    )  # your credentials
+
+# directory with files to process
+p = {"task":"DDI", "datadir": sys.argv[1], "outfile": sys.argv[2]}
+ddi(p["datadir"],p["outfile"])
+
+if use_neptune:
+    run["parameters"] = p
+    run["results/results"].upload(p["outfile"])
+    evaluator.evaluate(p["task"], '/'.join(p["datadir"].split('/')[:-1]+['']), p["outfile"], run if use_neptune else None)
+    run.stop()
+else:
+    evaluator.evaluate(p["task"], p["datadir"], p["outfile"], run if use_neptune else None)
