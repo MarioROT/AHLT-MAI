@@ -85,3 +85,40 @@ def check_verbs_after_and(tree, tkE1, tkE2):
                return lemma
       
    return None
+
+def check_LCS_is_monitor(tree, tkE1, tkE2):
+
+   if tkE1 is not None and tkE2 is not None:
+      lcs = tree.get_LCS(tkE1, tkE2)
+
+      if tree.get_tag(lcs)[0:2] == "VB" and tree.get_lemma(lcs) in ['monitor']:
+          return tree.get_lemma(lcs).lower() + tree.get_tag(lcs)[0:2]
+
+   return None
+
+def check_LCS_obj(tree, tkE1, tkE2):
+   
+   if tkE1 is not None and tkE2 is not None:
+      lcs = tree.get_LCS(tkE1, tkE2)
+      
+      for c in tree.get_children(lcs):
+         if tree.get_rel(c) == 'obj':
+            k = tree.get_lemma(lcs).lower()+'_'+tree.get_lemma(c).lower()
+            
+            if k in ['increase_response', 'diminish_response', 'regulate_proliferation',
+                     'prolong_time', 'increase_irritability', 'contain_epinephrine',
+                     'cause_arrhythmia', 'have_consequence', 'exacerbate_hypertension',
+                     'evaluate_possibility', 'produce_effect', 'increase_risk',
+                     'experience_reduction', 'modify_effect', 'take_capecitabine',
+                     'take_anticoagulant']:
+               return 'effect'
+            
+            if k in ['form_complex', 'increase_level', 'increase_clearance', 
+                     'affect_concentration', 'increase_area', 'have_which']:
+               return 'mechanism'
+            
+            if k in ['tell_doctor', 'exceed_dose', 'cause_hypermagnesemia']:
+               return 'advise'
+               
+   return None
+

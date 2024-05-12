@@ -12,6 +12,10 @@ import util.evaluator as evaluator
 from util.deptree import *
 import patterns
 
+import neptune
+from dotenv import dotenv_values
+from collections import Counter
+
 
 ## ------------------- 
 ## -- check if a pair has an interaction and of which type, applying a cascade of rules.
@@ -22,18 +26,27 @@ def check_interaction(tree, entities, e1, e2) :
    tkE1 = tree.get_fragment_head(entities[e1]['start'],entities[e1]['end'])
    tkE2 = tree.get_fragment_head(entities[e2]['start'],entities[e2]['end'])
 
+   # add more patterns to improve performance
+   p = patterns.check_lcs_verb_with_should(tree,tkE1,tkE2)
+   if p is not None: return p
+
+   # Check pattern: lemma of the LCS is the verb "monitor" --> advise
+   p = patterns.check_LCS_is_monitor(tree,tkE1,tkE2)
+   if p is not None: return p
+
    p = patterns.check_LCS_svo(tree,tkE1,tkE2)
    if p is not None: return p
    
    p = patterns.check_wib(tree,tkE1,tkE2,entities,e1,e2)
    if p is not None: return p
 
-   ## add more patterns to improve performance
-   p = patterns.check_lcs_verb_with_should(tree,tkE1,tkE2)
-   if p is not None: return p
-
    p = patterns.check_verbs_after_and(tree,tkE1,tkE2)
    if p is not None: return p
+
+   # Check pattern: Lemma and the entity under its "obj" belong to a certain list
+   p = patterns.check_LCS_obj(tree,tkE1,tkE2)
+   if p is not None: return p
+
    # p = patterns.check_XXXX(tree,tkE1,tkE2,...)
    # if p is not None: return p
 
@@ -90,10 +103,6 @@ def ddi(datadir, outfile) :
 datadir = sys.argv[1]
 outfile = sys.argv[2]
 
-ddi(datadir,outfile)
-
-evaluator.evaluate("DDI", datadir, outfile)
-
 try:
     use_neptune = sys.argv[3]
 except:
@@ -105,17 +114,20 @@ if use_neptune:
     run = neptune.init_run(
         project="projects.mai.bcn/AHLT",
         api_token=config['NPT_MAI_PB'],
-        tags=['NERC', 'baseline-NER']
+        tags=['DDI', 'baseline-DDI']
     )  # your credentials
 
 # directory with files to process
 p = {"task":"DDI", "datadir": sys.argv[1], "outfile": sys.argv[2]}
-ddi(p["datadir"],p["outfile"])
 
 if use_neptune:
+    for dataName in ['train', 'test', 'devel']:
+        ddi(p["datadir"] + f"{dataName}/" ,f"{dataName}-" + p["outfile"])
+        run[f"results/{dataName}-"+p["outfile"]].upload(f"{dataName}-" + p["outfile"])
+
     run["parameters"] = p
-    run["results/results"].upload(p["outfile"])
-    evaluator.evaluate(p["task"], '/'.join(p["datadir"].split('/')[:-1]+['']), p["outfile"], run if use_neptune else None)
+    evaluator.evaluate(p["task"], p["datadir"], p["outfile"], run)
     run.stop()
 else:
-    evaluator.evaluate(p["task"], p["datadir"], p["outfile"], run if use_neptune else None)
+    ddi(p["datadir"],p["outfile"])
+    evaluator.evaluate(p["task"], p["datadir"], p["outfile"])

@@ -47,7 +47,7 @@ def check_pattern_wib(tree,entities,e1,e2):
       l2,r2 = entities[e2]['start'],entities[e2]['end']
       
       p = []
-      for t in range(tkE1+1,tkE2) :
+      for t in range(tkE1+1,tkE2):
          # get token span
          l,r = tree.get_offset_span(t)
          # if the token is (syntactically) in between both entities
