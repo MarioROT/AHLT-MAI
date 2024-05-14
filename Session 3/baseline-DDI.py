@@ -26,20 +26,23 @@ def check_interaction(tree, entities, e1, e2) :
    tkE1 = tree.get_fragment_head(entities[e1]['start'],entities[e1]['end'])
    tkE2 = tree.get_fragment_head(entities[e2]['start'],entities[e2]['end'])
 
-   # add more patterns to improve performance
+   # Check if the LCS of two drug entities is associated with modal verbs --> advice
    p = patterns.check_lcs_verb_with_should(tree,tkE1,tkE2)
    if p is not None: return p
 
    # Check pattern: lemma of the LCS is the verb "monitor" --> advise
    p = patterns.check_LCS_is_monitor(tree,tkE1,tkE2)
    if p is not None: return p
-
+   
+   # Check LCS of two entities looking for association wit specific syntactic patterns
    p = patterns.check_LCS_svo(tree,tkE1,tkE2)
    if p is not None: return p
    
+   # Check words between entities belonging to lists.
    p = patterns.check_wib(tree,tkE1,tkE2,entities,e1,e2)
    if p is not None: return p
 
+   # Check verbs ocurring between "and", if is a verb in a list to map to a interactio  type
    p = patterns.check_verbs_after_and(tree,tkE1,tkE2)
    if p is not None: return p
 

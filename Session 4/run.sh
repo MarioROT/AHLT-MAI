@@ -36,7 +36,7 @@ AHLT=../
 
 # train SVM model
 echo "Training SVM model..."
-python train.py train.feat model.svm C=10 gamma=0.1
+# python train.py train.feat model.svm C=10
 # run SVM model
 echo "Running SVM model..."
 python predict.py train.feat model.svm > train-SVM.out
