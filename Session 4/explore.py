@@ -1,12 +1,13 @@
 #! /usr/bin/python3
 
 import sys
+sys.path.append('../')
 import re
 from os import listdir
 
 from xml.dom.minidom import parse
 
-from deptree import *
+from util.deptree import *
 
 
 # -----------------

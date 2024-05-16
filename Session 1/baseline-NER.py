@@ -226,13 +226,16 @@ if use_neptune:
 
 # directory with files to process
 p = {"task":"NER", "datadir": sys.argv[1], "outfile": sys.argv[2]}
-nerc(p["datadir"],p["outfile"])
 
 if use_neptune:
+    for dataName in ['train', 'test', 'devel']:
+        nerc(p["datadir"] + f"{dataName}/", f"{dataName}-" + p["outfile"])
+
     run["parameters"] = p
     run["results/results"].upload(p["outfile"])
-    evaluator.evaluate(p["task"], '/'.join(p["datadir"].split('/')[:-1]+['']), p["outfile"], run if use_neptune else None)
+    evaluator.evaluate(p["task"], p["datadir"], p["outfile"], run if use_neptune else None)
     run.stop()
 else:
+    nerc(p["datadir"],p["outfile"])
     evaluator.evaluate(p["task"], p["datadir"], p["outfile"], run if use_neptune else None)
 

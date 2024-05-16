@@ -142,6 +142,12 @@ def row(txt) :
 
 def print_statistics(gold,predicted, save = None, dataName = None):
     stats = {'kinds':[], 'tps':[], 'fps':[], 'fns':[], 'preds':[], 'exps':[], 'Ps':[], 'Rs':[], 'Fs':[]}
+    
+    if dataName:
+        print(f"---------------------- Test Results for {dataName} Data ---------------------------")
+    else:
+        print(f"--------------------------- Test Results --------------------------------")
+    
     print(row("")+"  tp\t  fp\t  fn\t#pred\t#exp\tP\tR\tF1")
     print("------------------------------------------------------------------------------")
     (nk,sP,sR,sF1) = (0,0,0,0)
@@ -164,9 +170,10 @@ def print_statistics(gold,predicted, save = None, dataName = None):
     (tp,fp,fn,npred,nexp,P,R,F1) = statistics(gold, predicted, "NOCLASS")
     [stats[key].append(["m.avg(no class)",tp,fp,fn,npred,nexp,P,R,F1][i]) for i, key in enumerate(stats.keys())]
     print(row("m.avg(no class)")+"{:>4}\t{:>4}\t{:>4}\t{:>4}\t{:>4}\t{:2.1%}\t{:2.1%}\t{:2.1%}".format(tp,fp,fn,npred,nexp, P, R, F1))               
+    print("------------------------------------------------------------------------------\n\n")
 
     if save:
-        save["results/performance"].upload(File.as_html(pd.DataFrame(stats)))
+        save[f"results/performance_{dataName}"].upload(File.as_html(pd.DataFrame(stats)))
         save[f'{dataName}/M.avg(Precision)'],save[f'{dataName}/M.avg(Recall)'],save[f'{dataName}/M.avg(F1)'] = sP,sR,sF1
 
 ## --
@@ -183,13 +190,13 @@ def evaluate(task, golddir, outfile, save=None):
                 gold = load_gold_NER(golddir + dataName)
             elif task == "DDI" :
                 # get set of expected relations in the whole golddir
-                gold = load_gold_DDI(golddir)
+                gold = load_gold_DDI(golddir + dataName)
             else :
                 print ("Invalid task '"+task+"'. Please specify 'NER' or 'DDI'.")        
 
 
             # Load entities/relations predicted by the system
-            predicted = load_predicted(task, outfile)
+            predicted = load_predicted(task, f"{dataName}-" + outfile)
 
             # compare both sets and compute statistics
             print_statistics(gold,predicted, save, dataName)
@@ -237,16 +244,20 @@ if __name__ == "__main__":
         run = neptune.init_run(
             project="projects.mai.bcn/AHLT",
             api_token=config['NPT_MAI_PB'],
-            tags=['NERC', use_neptune]
+            tags=['NERC' if p["task"] == 'NER' else 'DDI', use_neptune]
         )  # your credentials
 
 
     if use_neptune:
         run["parameters"] = p
-        run["results/results"].upload(p["outfile"])
+        for dataName in ["train", "devel", "test"]:
+            run[f"results/{dataName}-"+p["outfile"]].upload(f"{dataName}-" + p["outfile"])
         if any([i in use_neptune for i in ['NER-ML']]):
             run['files/extract-features'].upload('../Session 2/extract-features.py')
-        evaluate(p['task'], p['datadir'], p['outfile'], run if use_neptune else None)
+        if any([i in use_neptune for i in ['DDI-ML']]):
+            run['files/extract-features'].upload('../Session 4/extract-features.py')
+        
+        evaluate(p['task'], p['datadir'], p['outfile'], run)
         run.stop()
     else:
         # task = sys.argv[1]
@@ -254,5 +265,5 @@ if __name__ == "__main__":
         # outfile = sys.argv[3]
 
         # evaluate(task, golddir, outfile)
-        evaluate(p['task'], p['datadir'], p['outfile'], run if use_neptune else None)
+        evaluate(p['task'], p['datadir'], p['outfile'])
 

@@ -3,10 +3,11 @@
 import sys
 import re
 from os import listdir
+sys.path.append('../')
 
 from xml.dom.minidom import parse
 
-from deptree import *
+from util.deptree import *
 
 
 # -----------------
@@ -46,7 +47,7 @@ def check_pattern_wib(tree,entities,e1,e2):
       l2,r2 = entities[e2]['start'],entities[e2]['end']
       
       p = []
-      for t in range(tkE1+1,tkE2) :
+      for t in range(tkE1+1,tkE2):
          # get token span
          l,r = tree.get_offset_span(t)
          # if the token is (syntactically) in between both entities
@@ -68,7 +69,7 @@ def check_pattern_wib(tree,entities,e1,e2):
 
 
 # directory with files to process
-datadir = sys.argv[1]
+datadir = "../data/devel/" # sys.argv[1]
 
 countMT = {"mechanism":0, "effect":0, "int":0, "advise":0, "null":0}
 countPT = {}
@@ -119,6 +120,9 @@ for f in listdir(datadir) :
          
          #match = check_pattern_wib(analysis, entities, id_e1, id_e2)
          #match = check_my_other_pattern(analysis, entities, id_e1, id_e2)
+         # match = check_collocation(analysis, entities, id_e1, id_e2)
+         # match = check_svo_interaction(analysis, entities, id_e1, id_e2)
+         # match = check_conjunction_interaction(analysis, entities, id_e1, id_e2)
          ####################################################
          match = []
          
@@ -160,4 +164,5 @@ else:
       for t in countMT:
          k = m+"#"+t 
          if k in countPT:
+            # if countPT[k]/countP[m]>0.5 and t == "mechanism":
             print(f"P({t}|{m}) = {countPT[k]}/{countP[m]} = {countPT[k]/countP[m]}")

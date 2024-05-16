@@ -4,11 +4,17 @@ import sys
 import re
 from os import listdir
 
-from xml.dom.minidom import parse
-import evaluator
+sys.path.append('../')
 
-from deptree import *
+from xml.dom.minidom import parse
+import util.evaluator as evaluator
+
+from util.deptree import *
 import patterns
+
+import neptune
+from dotenv import dotenv_values
+from collections import Counter
 
 
 ## ------------------- 
@@ -20,13 +26,30 @@ def check_interaction(tree, entities, e1, e2) :
    tkE1 = tree.get_fragment_head(entities[e1]['start'],entities[e1]['end'])
    tkE2 = tree.get_fragment_head(entities[e2]['start'],entities[e2]['end'])
 
+   # Check if the LCS of two drug entities is associated with modal verbs --> advice
+   p = patterns.check_lcs_verb_with_should(tree,tkE1,tkE2)
+   if p is not None: return p
+
+   # Check pattern: lemma of the LCS is the verb "monitor" --> advise
+   p = patterns.check_LCS_is_monitor(tree,tkE1,tkE2)
+   if p is not None: return p
+   
+   # Check LCS of two entities looking for association wit specific syntactic patterns
    p = patterns.check_LCS_svo(tree,tkE1,tkE2)
    if p is not None: return p
    
+   # Check words between entities belonging to lists.
    p = patterns.check_wib(tree,tkE1,tkE2,entities,e1,e2)
    if p is not None: return p
 
-   ## add more patterns to improve performance
+   # Check verbs ocurring between "and", if is a verb in a list to map to a interactio  type
+   p = patterns.check_verbs_after_and(tree,tkE1,tkE2)
+   if p is not None: return p
+
+   # Check pattern: Lemma and the entity under its "obj" belong to a certain list
+   p = patterns.check_LCS_obj(tree,tkE1,tkE2)
+   if p is not None: return p
+
    # p = patterns.check_XXXX(tree,tkE1,tkE2,...)
    # if p is not None: return p
 
@@ -83,7 +106,31 @@ def ddi(datadir, outfile) :
 datadir = sys.argv[1]
 outfile = sys.argv[2]
 
-ddi(datadir,outfile)
+try:
+    use_neptune = sys.argv[3]
+except:
+    use_neptune = None
 
-evaluator.evaluate("DDI", datadir, outfile)
+if use_neptune:
+    config = dotenv_values("../.env")
 
+    run = neptune.init_run(
+        project="projects.mai.bcn/AHLT",
+        api_token=config['NPT_MAI_PB'],
+        tags=['DDI', 'baseline-DDI']
+    )  # your credentials
+
+# directory with files to process
+p = {"task":"DDI", "datadir": sys.argv[1], "outfile": sys.argv[2]}
+
+if use_neptune:
+    for dataName in ['train', 'test', 'devel']:
+        ddi(p["datadir"] + f"{dataName}/" ,f"{dataName}-" + p["outfile"])
+        run[f"results/{dataName}-"+p["outfile"]].upload(f"{dataName}-" + p["outfile"])
+
+    run["parameters"] = p
+    evaluator.evaluate(p["task"], p["datadir"], p["outfile"], run)
+    run.stop()
+else:
+    ddi(p["datadir"],p["outfile"])
+    evaluator.evaluate(p["task"], p["datadir"], p["outfile"])
