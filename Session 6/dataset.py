@@ -3,7 +3,9 @@ import os, sys
 from xml.dom.minidom import parse
 import pickle
 
-from deptree import *
+sys.path.append('../')
+
+from util.deptree import *
 
 class Dataset:
     ##  Parse all XML files in given dir, and load a list of sentences.
