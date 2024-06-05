@@ -10,6 +10,16 @@ class Codemaps :
     # --- constructor, create mapper either from training data, or
     # --- loading codemaps from given file
     def __init__(self, data, maxlen=None, suflen=None) :
+        
+        self.external = {}
+        with open("../resources/HSDB.txt", encoding="utf-8") as h :
+            for x in h.readlines() :
+                self.external[x.strip().lower()] = "drug"
+        with open("../resources/DrugBank.txt", encoding="utf-8") as h :
+            for x in h.readlines() :
+                (n,t) = x.strip().lower().split("|")
+                self.external[n] = t
+
 
         if isinstance(data,Dataset) and maxlen is not None and suflen is not None:
             self.__create_indexs(data, maxlen, suflen)
@@ -20,6 +30,9 @@ class Codemaps :
         else:
             print('codemaps: Invalid or missing parameters in constructor')
             exit()
+
+
+ 
 
             
     # --------- Create indexs from training data
@@ -168,6 +181,77 @@ class Codemaps :
 
         # Return the encoded sequences
         return [Xw, Xs, Xl, Xcap, Xdash, Xnum]
+    
+
+    def encode_words(self, data):
+        # encode sentence words (including lowercase)
+        enc_words = [
+            torch.Tensor([
+                self.word_index[w['form']] if w['form'] in self.word_index else self.word_index['UNK'] 
+                for w in s
+            ]) for s in data.sentences()
+        ]
+        
+        enc_lower = [
+            torch.Tensor([
+                self.word_index[w['form'].lower()] if w['form'].lower() in self.word_index else self.word_index['UNK']
+                for w in s
+            ]) for s in data.sentences()
+        ]
+
+        # truncate sentences longer than maxlen
+        enc_words = [s[0:self.maxlen] for s in enc_words]
+        enc_lower = [s[0:self.maxlen] for s in enc_lower]
+
+        # Create padding tensors for words and lowercased words
+        Xw = torch.full((len(enc_words), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
+        Xl = torch.full((len(enc_lower), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
+        for i, s in enumerate(enc_words):
+            Xw[i, 0:len(s)] = s
+        for i, s in enumerate(enc_lower):
+            Xl[i, 0:len(s)] = s
+
+        # encode sentence suffixes
+        enc_sufs = [
+            torch.Tensor([
+                self.suf_index[w['lc_form'][-self.suflen:]] if w['lc_form'][-self.suflen:] in self.suf_index else self.suf_index['UNK']
+                for w in s
+            ]) for s in data.sentences()
+        ]
+        # truncate sentences longer than maxlen
+        enc_sufs = [s[0:self.maxlen] for s in enc_sufs]
+        # create a tensor full of padding
+        Xs = torch.full((len(enc_sufs), self.maxlen), self.suf_index['PAD'], dtype=torch.int64)
+        for i, s in enumerate(enc_sufs):
+            Xs[i, 0:len(s)] = s
+
+        # Additional features as separate tensors
+        Xcap = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Capitalization
+        Xdash = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Dashes
+        Xnum = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Numbers
+        Xext = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # External presence
+        Xspecial = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Special characters
+        Xlen = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Length of words
+        Xpos = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Position in sentence
+        
+        for i, s in enumerate(data.sentences()):
+            for j, w in enumerate(s):
+                if j < self.maxlen:
+                    Xcap[i, j] = w['form'][0].isupper()  # Capitalization
+                    Xdash[i, j] = '-' in w['form']  # Dashes
+                    Xnum[i, j] = any(char.isdigit() for char in w['form'])  # Numbers
+                    Xext[i, j] = self.is_in_external(w['form'])  # External presence
+                    Xspecial[i, j] = any(char in '%@#&$*' for char in w['form'])  # Special characters
+                    Xlen[i, j] = len(w['form'])  # Length of word
+                    Xpos[i, j] = j  # Position in sentence
+
+        # Return the encoded sequences
+        return [Xw, Xs, Xl, Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos]
+
+    # Example method for checking presence in an external dictionary
+    def is_in_external(self, word):
+        return word in self.external  # Assume self.external is a set of words
+
 
     
     ## --------- encode Y from given data ----------- 
