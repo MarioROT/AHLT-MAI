@@ -1,15 +1,10 @@
---------------------------- Test Results --------------------------------
-                   tp	  fp	  fn	#pred	#exp	P	R	F1
-------------------------------------------------------------------------------
-brand               0	   0	 374	   0	 374	0.0%	0.0%	0.0%
-drug             1188	1228	 718	2416	1906	49.2%	62.3%	55.0%
-drug_n              0	   0	  45	   0	  45	0.0%	0.0%	0.0%
-group              14	  13	 673	  27	 687	51.9%	2.0%	3.9%
-------------------------------------------------------------------------------
-M.avg            -	-	-	-	-	25.3%	16.1%	14.7%
-------------------------------------------------------------------------------
-m.avg            1202	1241	1810	2443	3012	49.2%	39.9%	44.1%
-m.avg(no class)  1723	 720	1289	2443	3012	70.5%	57.2%	63.2%
-------------------------------------------------------------------------------
-
-
+[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-134
+[neptune] [warning] Info (NVML): NVML Shared Library Not Found. GPU usage metrics may not be reported. For more information, see https://docs.neptune.ai/help/nvml_error/
+[neptune] [info   ] Shutting down background jobs, please wait a moment...
+[neptune] [info   ] Done!
+[neptune] [info   ] Waiting for the remaining 33 operations to synchronize with Neptune. Do not kill this process.
+[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file C:\Users\Kamil\Documents\sem10-FIB\AHLT\AHLT-MAI\Session 5\devel-devel.out: Path not found or is a not a file.
+[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file C:\Users\Kamil\Documents\sem10-FIB\AHLT\AHLT-MAI\Session 5\test-devel.out: Path not found or is a not a file.
+[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file C:\Users\Kamil\Documents\sem10-FIB\AHLT\AHLT-MAI\Session 5\train-devel.out: Path not found or is a not a file.
+[neptune] [info   ] All 33 operations synced, thanks for waiting!
+[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-134/metadata

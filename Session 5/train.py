@@ -14,6 +14,11 @@ from codemaps import *
 
 from network import nercLSTM, criterion
 
+import neptune
+from neptune.types import File
+from dotenv import dotenv_values
+
+
 random.seed(12345)
 torch.manual_seed(121212)
 
@@ -41,6 +46,8 @@ def train(epoch):
                    100.*(batch_idx+1)/len(train_loader),
                    avg_loss),
             flush=True, end='')
+    #   if use_neptune:
+    #       run['train/loss'].log(avg_loss)
    print()
 
 #----------------------------------------------
@@ -64,6 +71,9 @@ def test():
                test_loss,
                correct, total,
                100.*correct/total))
+    # if use_neptune:
+    #     run['val/loss'].log(test_loss)
+    #     run['val/accuracy'].log(100.*correct/total)
 
 #----------------------------------------------
 def encode_dataset(ds, codes) :
@@ -89,6 +99,19 @@ traindir = sys.argv[1]
 validationdir = sys.argv[2]
 n_epochs = int(sys.argv[3])
 modelname = sys.argv[4]
+# try:
+#     use_neptune = sys.argv[5]
+# except:
+#     use_neptune = None
+
+# if use_neptune:
+#     config = dotenv_values("../.env")
+
+#     run = neptune.init_run(
+#         project="projects.mai.bcn/AHLT",
+#         api_token=config['NPT_MAI_PB'],
+#         tags=['NERC', use_neptune]
+#     )  # your credentials
 
 # load train and validation data
 traindata = Dataset(traindir)

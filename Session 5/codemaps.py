@@ -80,17 +80,71 @@ class Codemaps :
 
 
     ## --------- encode X from given data ----------- 
-    def encode_words(self, data) :
+    # def encode_words(self, data) :
 
-        # encode sentence words
-        enc = [torch.Tensor([self.word_index[w['form']] if w['form'] in self.word_index else self.word_index['UNK'] for w in s]) for s in data.sentences()]
-        # cut sentences longer than maxlen
-        enc = [s[0:self.maxlen] for s in enc]
-        # create a tensor full of padding
-        tsr = torch.Tensor([])
-        Xw = tsr.new_full((len(enc), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
-        # fill padding tensor with sentence data
-        for i, s in enumerate(enc): Xw[i, 0:s.size()[0]] = s
+    #     # encode sentence words
+    #     enc = [torch.Tensor([self.word_index[w['form']] if w['form'] in self.word_index else self.word_index['UNK'] for w in s]) for s in data.sentences()]
+    #     # cut sentences longer than maxlen
+    #     enc = [s[0:self.maxlen] for s in enc]
+    #     enc_lower = [s[0:self.maxlen] for s in enc_lower]
+    #     # create a tensor full of padding
+    #     tsr = torch.Tensor([])
+    #     Xw = tsr.new_full((len(enc), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
+    #     Xl = torch.full((len(enc_lower), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
+
+    #     # fill padding tensor with sentence data
+    #     for i, s in enumerate(enc): Xw[i, 0:s.size()[0]] = s
+
+    #     # encode sentence suffixes
+    #     enc = [torch.Tensor([self.suf_index[w['lc_form'][-self.suflen:]] if w['lc_form'][-self.suflen:] in self.suf_index else self.suf_index['UNK'] for w in s]) for s in data.sentences()]
+    #     # cut sentences longer than maxlen
+    #     enc = [s[0:self.maxlen] for s in enc]
+    #     # create a tensor full of padding
+    #     enc_words
+    #     Xs = tsr.new_full((len(enc), self.maxlen), self.suf_index['PAD'], dtype=torch.int64)
+    #     # fill padding tensor with sentence data
+    #     for i, s in enumerate(enc): Xs[i, 0:s.size()[0]] = s
+
+    #     # cut sentences longer than maxlen
+    #     enc = [s[0:self.maxlen] for s in enc]
+    #     # create a tensor full of zeros
+    #     Xf = torch.zeros((len(enc), self.maxlen, 11), dtype=torch.int64)
+    #     # fill padding tensor with sentence data
+    #     for i, s in enumerate(enc):
+    #         for j, f in enumerate(enc[i]) :
+    #             Xf[i, j] = f
+
+    #     # return encoded sequences
+    #     return [Xl,Xw,Xs,Xf]
+    #     # return [Xw,Xs]
+    def encode_words(self, data):
+        # encode sentence words (including lowercase)
+        enc_words = [
+            torch.Tensor([
+                self.word_index[w['form']] if w['form'] in self.word_index else self.word_index['UNK'] 
+                for w in s
+            ]) for s in data.sentences()
+        ]
+        
+        enc_lower = [
+            torch.Tensor([
+                self.word_index[w['form'].lower()] if w['form'].lower() in self.word_index else self.word_index['UNK']
+                for w in s
+            ]) for s in data.sentences()
+        ]
+
+        # truncate sentences longer than maxlen
+        enc_words = [s[0:self.maxlen] for s in enc_words]
+        enc_lower = [s[0:self.maxlen] for s in enc_lower]
+
+        # Create padding tensors for words and lowercased words
+        Xw = torch.full((len(enc_words), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
+        Xl = torch.full((len(enc_lower), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
+        for i, s in enumerate(enc_words):
+            Xw[i, 0:len(s)] = s
+        for i, s in enumerate(enc_lower):
+            Xl[i, 0:len(s)] = s
+
 
         # encode sentence suffixes
         enc = [torch.Tensor([self.suf_index[w['lc_form'][-self.suflen:]] if w['lc_form'][-self.suflen:] in self.suf_index else self.suf_index['UNK'] for w in s]) for s in data.sentences()]
@@ -99,21 +153,21 @@ class Codemaps :
         # create a tensor full of padding
         tsr = torch.Tensor([])
         Xs = tsr.new_full((len(enc), self.maxlen), self.suf_index['PAD'], dtype=torch.int64)
-        # fill padding tensor with sentence data
-        for i, s in enumerate(enc): Xs[i, 0:s.size()[0]] = s
 
-        # cut sentences longer than maxlen
-        enc = [s[0:self.maxlen] for s in enc]
-        # create a tensor full of zeros
-        Xf = torch.zeros((len(enc), self.maxlen, 11), dtype=torch.int64)
-        # fill padding tensor with sentence data
-        for i, s in enumerate(enc):
-            for j, f in enumerate(enc[i]) :
-                Xf[i, j] = f
+        # Additional features as separate tensors
+        Xcap = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Capitalization
+        Xdash = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Dashes
+        Xnum = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Numbers
+        Xext = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # External presence
+        for i, s in enumerate(data.sentences()):
+            for j, w in enumerate(s):
+                if j < self.maxlen:
+                    Xcap[i, j] = w['form'][0].isupper()  # Capitalization
+                    Xdash[i, j] = '-' in w['form']  # Dashes
+                    Xnum[i, j] = any(char.isdigit() for char in w['form'])  # Numbers
 
-        # return encoded sequences
-        #return [Xlw,Xw,Xs,Xf]
-        return [Xw,Xs]
+        # Return the encoded sequences
+        return [Xw, Xs, Xl, Xcap, Xdash, Xnum]
 
     
     ## --------- encode Y from given data ----------- 
