@@ -12,13 +12,16 @@ class Codemaps :
     def __init__(self, data, maxlen=None, suflen=None) :
         
         self.external = {}
-        with open("../resources/HSDB.txt", encoding="utf-8") as h :
-            for x in h.readlines() :
+        with open("../resources/HSDB.txt", encoding="utf-8") as h:
+            for x in h.readlines():
                 self.external[x.strip().lower()] = "drug"
-        with open("../resources/DrugBank.txt", encoding="utf-8") as h :
-            for x in h.readlines() :
-                (n,t) = x.strip().lower().split("|")
+        with open("../resources/DrugBank.txt", encoding="utf-8") as h:
+            for x in h.readlines():
+                (n, t) = x.strip().lower().split("|")
                 self.external[n] = t
+        
+        # Mapping entities to unique integers
+        self.entity_to_index = {"NONE": 0, "drug": 1, "drug_n": 2, "brand": 3, "group": 4}
 
 
         if isinstance(data,Dataset) and maxlen is not None and suflen is not None:
@@ -130,58 +133,62 @@ class Codemaps :
     #     # return encoded sequences
     #     return [Xl,Xw,Xs,Xf]
     #     # return [Xw,Xs]
-    def encode_words(self, data):
-        # encode sentence words (including lowercase)
-        enc_words = [
-            torch.Tensor([
-                self.word_index[w['form']] if w['form'] in self.word_index else self.word_index['UNK'] 
-                for w in s
-            ]) for s in data.sentences()
-        ]
+    ###############################################################################################
+    # def encode_words(self, data):
+    #     # encode sentence words (including lowercase)
+    #     enc_words = [
+    #         torch.Tensor([
+    #             self.word_index[w['form']] if w['form'] in self.word_index else self.word_index['UNK'] 
+    #             for w in s
+    #         ]) for s in data.sentences()
+    #     ]
         
-        enc_lower = [
-            torch.Tensor([
-                self.word_index[w['form'].lower()] if w['form'].lower() in self.word_index else self.word_index['UNK']
-                for w in s
-            ]) for s in data.sentences()
-        ]
+    #     enc_lower = [
+    #         torch.Tensor([
+    #             self.word_index[w['form'].lower()] if w['form'].lower() in self.word_index else self.word_index['UNK']
+    #             for w in s
+    #         ]) for s in data.sentences()
+    #     ]
 
-        # truncate sentences longer than maxlen
-        enc_words = [s[0:self.maxlen] for s in enc_words]
-        enc_lower = [s[0:self.maxlen] for s in enc_lower]
+    #     # truncate sentences longer than maxlen
+    #     enc_words = [s[0:self.maxlen] for s in enc_words]
+    #     enc_lower = [s[0:self.maxlen] for s in enc_lower]
 
-        # Create padding tensors for words and lowercased words
-        Xw = torch.full((len(enc_words), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
-        Xl = torch.full((len(enc_lower), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
-        for i, s in enumerate(enc_words):
-            Xw[i, 0:len(s)] = s
-        for i, s in enumerate(enc_lower):
-            Xl[i, 0:len(s)] = s
+    #     # Create padding tensors for words and lowercased words
+    #     Xw = torch.full((len(enc_words), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
+    #     Xl = torch.full((len(enc_lower), self.maxlen), self.word_index['PAD'], dtype=torch.int64)
+    #     for i, s in enumerate(enc_words):
+    #         Xw[i, 0:len(s)] = s
+    #     for i, s in enumerate(enc_lower):
+    #         Xl[i, 0:len(s)] = s
 
 
-        # encode sentence suffixes
-        enc = [torch.Tensor([self.suf_index[w['lc_form'][-self.suflen:]] if w['lc_form'][-self.suflen:] in self.suf_index else self.suf_index['UNK'] for w in s]) for s in data.sentences()]
-        # cut sentences longer than maxlen
-        enc = [s[0:self.maxlen] for s in enc]
-        # create a tensor full of padding
-        tsr = torch.Tensor([])
-        Xs = tsr.new_full((len(enc), self.maxlen), self.suf_index['PAD'], dtype=torch.int64)
+    #     # encode sentence suffixes
+    #     enc = [torch.Tensor([self.suf_index[w['lc_form'][-self.suflen:]] if w['lc_form'][-self.suflen:] in self.suf_index else self.suf_index['UNK'] for w in s]) for s in data.sentences()]
+    #     # cut sentences longer than maxlen
+    #     enc = [s[0:self.maxlen] for s in enc]
+    #     # create a tensor full of padding
+    #     tsr = torch.Tensor([])
+    #     Xs = tsr.new_full((len(enc), self.maxlen), self.suf_index['PAD'], dtype=torch.int64)
 
-        # Additional features as separate tensors
-        Xcap = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Capitalization
-        Xdash = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Dashes
-        Xnum = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Numbers
-        Xext = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # External presence
-        for i, s in enumerate(data.sentences()):
-            for j, w in enumerate(s):
-                if j < self.maxlen:
-                    Xcap[i, j] = w['form'][0].isupper()  # Capitalization
-                    Xdash[i, j] = '-' in w['form']  # Dashes
-                    Xnum[i, j] = any(char.isdigit() for char in w['form'])  # Numbers
+    #     # Additional features as separate tensors
+    #     Xcap = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Capitalization
+    #     Xdash = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Dashes
+    #     Xnum = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # Numbers
+    #     Xext = torch.zeros((len(enc_words), self.maxlen), dtype=torch.int64)  # External presence
+    #     for i, s in enumerate(data.sentences()):
+    #         for j, w in enumerate(s):
+    #             if j < self.maxlen:
+    #                 Xcap[i, j] = w['form'][0].isupper()  # Capitalization
+    #                 Xdash[i, j] = '-' in w['form']  # Dashes
+    #                 Xnum[i, j] = any(char.isdigit() for char in w['form'])  # Numbers
 
-        # Return the encoded sequences
-        return [Xw, Xs, Xl, Xcap, Xdash, Xnum]
-    
+    #     # Return the encoded sequences
+    #     return [Xw, Xs, Xl, Xcap, Xdash, Xnum]
+    ###############################################################################################
+
+    def get_external(self, word):
+        return self.entity_to_index.get(self.external.get(word.lower(), 'NONE'))
 
     def encode_words(self, data):
         # encode sentence words (including lowercase)
@@ -240,17 +247,13 @@ class Codemaps :
                     Xcap[i, j] = w['form'][0].isupper()  # Capitalization
                     Xdash[i, j] = '-' in w['form']  # Dashes
                     Xnum[i, j] = any(char.isdigit() for char in w['form'])  # Numbers
-                    Xext[i, j] = self.is_in_external(w['form'])  # External presence
+                    Xext[i, j] = self.get_external(w['form'])  # External presence as integer
                     Xspecial[i, j] = any(char in '%@#&$*' for char in w['form'])  # Special characters
                     Xlen[i, j] = len(w['form'])  # Length of word
                     Xpos[i, j] = j  # Position in sentence
 
         # Return the encoded sequences
         return [Xw, Xs, Xl, Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos]
-
-    # Example method for checking presence in an external dictionary
-    def is_in_external(self, word):
-        return word in self.external  # Assume self.external is a set of words
 
 
     
