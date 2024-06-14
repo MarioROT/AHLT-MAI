@@ -31,9 +31,7 @@ criterion = nn.CrossEntropyLoss()
 #       x = self.lstm(x)[0]              
 #       x = self.out(x)
 #       return x
-   
-import torch
-import torch.nn as nn
+
 
 class nercLSTM(nn.Module):
     def __init__(self, codes):
@@ -58,50 +56,52 @@ class nercLSTM(nn.Module):
         self.lstm_suf = nn.LSTM(50, 50, bidirectional=True, batch_first=True)
         self.lstm_lower = nn.LSTM(100, 100, bidirectional=True, batch_first=True)  # LSTM for lowercased words
 
-        # LSTM for combined features
-        self.lstm_combined = nn.LSTM(300 + additional_feature_dim, 200, bidirectional=True, batch_first=True)
-        self.out = nn.Linear(400, n_labels)
+        # LSTM for combined features (updated input size)
+        combined_input_size = 200 + 100 + 200 + additional_feature_dim  # Corrected combined input size
+        self.lstm_combined = nn.LSTM(combined_input_size, 200, bidirectional=True, batch_first=True)
+
+        # Fully connected layers
+        self.fc1 = nn.Linear(400, 200)
+        self.fc2 = nn.Linear(200, 100)
+        
+        # Output layer
+        self.out = nn.Linear(100, n_labels)
 
     def forward(self, w, s, l, Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos):
-        # print("Input shapes:", w.shape, s.shape, l.shape, Xcap.shape, Xdash.shape, Xnum.shape, Xext.shape, Xspecial.shape, Xlen.shape, Xpos.shape)
-        
         # Word embeddings
         x = self.embW(w)
-        # print("Word embeddings shape:", x.shape)
         x = self.dropW(x)
         x, _ = self.lstm_word(x)
-        # print("Word LSTM output shape:", x.shape)
 
         # Suffix embeddings
         y = self.embS(s)
-        # print("Suffix embeddings shape:", y.shape)
         y = self.dropS(y)
         y, _ = self.lstm_suf(y)
-        # print("Suffix LSTM output shape:", y.shape)
 
         # Lowercased word embeddings
         z = self.embL(l)
-        # print("Lowercased word embeddings shape:", z.shape)
         z = self.dropL(z)
         z, _ = self.lstm_lower(z)
-        # print("Lowercased word LSTM output shape:", z.shape)
 
         # Concatenate the word, suffix, and lowercased word LSTM outputs
         combined_embeddings = torch.cat((x, y, z), dim=2)
-        # print("Combined embeddings shape:", combined_embeddings.shape)
 
         # Concatenate the additional features
         additional_features = torch.stack((Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos), dim=2).float()
-        # print("Additional features shape:", additional_features.shape)
         combined_features = torch.cat((combined_embeddings, additional_features), dim=2)
-        # print("Combined features shape:", combined_features.shape)
 
         # Combined LSTM
         combined_features, _ = self.lstm_combined(combined_features)
-        # print("Combined LSTM output shape:", combined_features.shape)
-        output = self.out(combined_features)
-        # print("Output shape:", output.shape)
+        
+        # Fully connected layers
+        fc_output = torch.relu(self.fc1(combined_features))
+        fc_output = torch.relu(self.fc2(fc_output))
+
+        # Output layer
+        output = self.out(fc_output)
+        
         return output
+
 
 
 # class nercLSTM(nn.Module):
