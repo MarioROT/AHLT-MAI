@@ -44,25 +44,25 @@ class nercLSTM(nn.Module):
         n_sufs = codes.get_n_sufs()
         n_labels = codes.get_n_labels()
 
-        self.embW = nn.Embedding(n_words, 100)
-        self.embS = nn.Embedding(n_sufs, 50)
-        self.embL = nn.Embedding(n_words, 100)  # Embedding for lowercased words
-        self.dropW = nn.Dropout(0.1)
-        self.dropS = nn.Dropout(0.1)
-        self.dropL = nn.Dropout(0.1)  # Dropout for lowercased words
+        self.embW = nn.Embedding(n_words, 200)
+        self.embS = nn.Embedding(n_sufs, 100)
+        self.embL = nn.Embedding(n_words, 200)  # Embedding for lowercased words
+        self.dropW = nn.Dropout(0.3)
+        self.dropS = nn.Dropout(0.3)
+        self.dropL = nn.Dropout(0.3)  # Dropout for lowercased words
 
         additional_feature_dim = 7  # Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos
 
-        self.lstm_word = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
-        self.lstm_suf = nn.LSTM(50, 50, bidirectional=True, batch_first=True)
-        self.lstm_lower = nn.LSTM(100, 100, bidirectional=True, batch_first=True)  # LSTM for lowercased words
+        self.lstm_word = nn.LSTM(200, 200, bidirectional=True, batch_first=True)
+        self.lstm_suf = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
+        self.lstm_lower = nn.LSTM(200, 200, bidirectional=True, batch_first=True)  # LSTM for lowercased words
 
-        combined_input_size = 200 + 100 + 200 + additional_feature_dim  # Corrected combined input size
-        self.lstm_combined = nn.LSTM(combined_input_size, 200, bidirectional=True, batch_first=True)
+        combined_input_size = 400 + 200 + 400 + additional_feature_dim  # Corrected combined input size
+        self.lstm_combined = nn.LSTM(combined_input_size, 400, bidirectional=True, batch_first=True)
 
-        self.fc1 = nn.Linear(400, 200)
-        self.fc2 = nn.Linear(200, 100)
-        self.out = nn.Linear(100, n_labels)
+        self.fc1 = nn.Linear(800, 400)
+        self.fc2 = nn.Linear(400, 200)
+        self.out = nn.Linear(200, n_labels)
 
     def forward(self, w, s, l, Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos):
         x = self.embW(w)
@@ -90,6 +90,7 @@ class nercLSTM(nn.Module):
         output = self.out(fc_output)
         
         return output
+
 
 ############################################################
 ## Network with Bert embeddings
