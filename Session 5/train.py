@@ -118,8 +118,8 @@ traindata = Dataset(traindir)
 valdata = Dataset(validationdir)
 
 # create indexes from training data
-max_len = 150
-suf_len = 5
+max_len = 250
+suf_len = 6
 codes  = Codemaps(traindata, max_len, suf_len)
 
 # encode datasets
@@ -128,11 +128,11 @@ val_loader = encode_dataset(valdata, codes)
 
 # build network
 network = nercLSTM(codes)
-optimizer = optim.Adam(network.parameters())
+optimizer = optim.Adam(network.parameters(), lr=0.001)
 if torch.cuda.is_available() :
    network.to(torch.device("cuda:0"))
 
-summary(network)
+#summary(network)
    
 for epoch in range(n_epochs):
    train(epoch)

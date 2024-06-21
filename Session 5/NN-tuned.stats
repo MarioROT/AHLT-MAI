@@ -1,0 +1,8 @@
+[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-194
+[neptune] [info   ] Shutting down background jobs, please wait a moment...
+[neptune] [info   ] Done!
+[neptune] [info   ] Waiting for the remaining 153 operations to synchronize with Neptune. Do not kill this process.
+[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file C:\Users\mario\Github\UPC\AHLT - Advanced Human Language Technologies\Session 5\test-NN.out: Path not found or is a not a file.
+[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file C:\Users\mario\Github\UPC\AHLT - Advanced Human Language Technologies\Session 5\train-NN.out: Path not found or is a not a file.
+[neptune] [info   ] All 153 operations synced, thanks for waiting!
+[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-194/metadata
