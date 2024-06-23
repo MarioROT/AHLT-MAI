@@ -168,13 +168,6 @@ class nercLSTM(nn.Module):
         n_pos = codes.get_n_pos()
         n_lemma = codes.get_n_lemmas()
         n_labels = codes.get_n_labels()
-        n_caps = codes.get_n_caps()
-        n_dash = codes.get_n_dash()
-        n_num = codes.get_n_num()
-        n_ext = codes.get_n_ext()
-        n_special = codes.get_n_special()
-        n_len = codes.get_n_len()
-        n_pos = codes.get_n_pos()
 
         self.embW = nn.Embedding(n_words, 200)
         self.embS = nn.Embedding(n_sufs, 100)
@@ -182,13 +175,6 @@ class nercLSTM(nn.Module):
         self.embPos = nn.Embedding(n_pos, 100)
         self.embLemma = nn.Embedding(n_lemma, 100)
         self.embL = nn.Embedding(n_words, 200)  # Embedding for lowercased words
-        self.embCap = nn.Embedding(n_caps, 100)
-        self.embDash = nn.Embedding(n_dash, 100)
-        self.embNum = nn.Embedding(n_num, 100)
-        self.embExt = nn.Embedding(n_ext, 100)
-        self.embSpecial = nn.Embedding(n_special, 100)
-        self.embLen = nn.Embedding(n_len, 100)
-        self.embXpos = nn.Embedding(n_pos, 100) 
         self.dropW = nn.Dropout(0.3)
         self.dropS = nn.Dropout(0.3)
         self.dropP = nn.Dropout(0.3)
@@ -196,7 +182,7 @@ class nercLSTM(nn.Module):
         self.dropLemma = nn.Dropout(0.3)
         self.dropL = nn.Dropout(0.3)  # Dropout for lowercased words
 
-        # additional_feature_dim = 7  # Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos
+        additional_feature_dim = 7  # Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos
 
         self.lstm_word = nn.LSTM(200, 200, bidirectional=True, batch_first=True)
         self.lstm_suf = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
@@ -204,13 +190,6 @@ class nercLSTM(nn.Module):
         self.lstm_pos = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
         self.lstm_lemma = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
         self.lstm_lower = nn.LSTM(200, 200, bidirectional=True, batch_first=True)  # LSTM for lowercased words
-        self.lstm_cap = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
-        self.lstm_dash = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
-        self.lstm_num = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
-        self.lstm_ext = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
-        self.lstm_special = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
-        self.lstm_len = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
-        self.lstm_pos = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
 
         combined_input_size = 400 + 200 + 200 + 200 + 200 + 400 + additional_feature_dim  # Corrected combined input size
         #combined_input_size = 400 + 200 + 400 + additional_feature_dim  # Corrected combined input size
@@ -252,26 +231,47 @@ class nercLSTM(nn.Module):
         combined_embeddings = torch.cat((x, y, y2, z, z1, z2), dim=2)
         #combined_embeddings = torch.cat((x, y, z), dim=2)
 
-        dash = self.embL(Xdash)
-        dash = self.dropL(dash)
-        dash, _ = self.lstm_lower(dash)
+        additional_features = torch.stack((Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos), dim=2).float()
+        combined_features = torch.cat((combined_embeddings, additional_features), dim=2)
 
-        num = self.embL(Xnum)
-        num = self.dropL(num)
-        num, _ = self.lstm_lower(num)
+        combined_features, _ = self.lstm_combined(combined_features)
 
-        ext = self.embL(Xext)
-        ext = self.dropL(ext)
-        ext, _ = self.lstm_lower(ext)
+        # attention_output = self.attention(combined_features)  # Apply attention mechanism
+        attention_output = combined_features
+        
+        fc_output = torch.relu(self.fc1(attention_output))
+        fc_output = torch.relu(self.fc2(fc_output))
 
-        special = self.embL(Xspecial)
-        special = self.dropL(special)
-        special, _ = self.lstm_lower(special)
+        output = self.out(fc_output)
+        
+        return output
 
-        len = self.embL(Xlen)
-        len = self.dropL(len)
-        len, _ = self.lstm_lower(len)
+# class nercLSTM(nn.Module):
+#    def __init__(self, codes) :
+#       super(nercLSTM, self).__init__()
 
+#       n_words = codes.get_n_words()
+#       n_sufs = codes.get_n_sufs()
+#       n_labels = codes.get_n_labels()
+      
+#       self.embW = nn.Embedding(n_words, 100)
+#       self.embS = nn.Embedding(n_sufs, 50)      
+#       self.dropW = nn.Dropout(0.1)
+#       self.dropS = nn.Dropout(0.1)
+#       self.lstm = nn.LSTM(150, 200, bidirectional=True, batch_first=True)
+#       self.out = nn.Linear(400, n_labels)
+
+
+#    def forward(self, w, s):
+#       x = self.embW(w)
+#       y = self.embS(s)
+#       x = self.dropW(x)
+#       y = self.dropS(y)
+
+#       x = torch.cat((x, y), dim=2)
+#       x = self.lstm(x)[0]              
+#       x = self.out(x)
+#       return x
         pos = self.embL(Xpos)
         pos = self.dropL(pos)
         pos, _ = self.lstm_lower(pos)
