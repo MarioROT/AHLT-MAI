@@ -1,51 +1,52 @@
-[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-204
+[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-213
+[neptune] [warning] Info (NVML): Unknown Error. GPU usage metrics may not be reported. For more information, see https://docs.neptune.ai/help/nvml_error/
 ---------------------- Test Results for train Data ---------------------------
                    tp	  fp	  fn	#pred	#exp	P	R	F1
 ------------------------------------------------------------------------------
-brand            1143	   9	  15	1152	1158	99.2%	98.7%	99.0%
-drug             7003	  29	 253	7032	7256	99.6%	96.5%	98.0%
-drug_n            430	  51	  97	 481	 527	89.4%	81.6%	85.3%
-group            2543	  53	 143	2596	2686	98.0%	94.7%	96.3%
+brand            1142	  16	  16	1158	1158	98.6%	98.6%	98.6%
+drug             6990	  45	 266	7035	7256	99.4%	96.3%	97.8%
+drug_n            417	  37	 110	 454	 527	91.9%	79.1%	85.0%
+group            2532	  62	 154	2594	2686	97.6%	94.3%	95.9%
 ------------------------------------------------------------------------------
-M.avg            -	-	-	-	-	96.5%	92.9%	94.6%
+M.avg            -	-	-	-	-	96.9%	92.1%	94.3%
 ------------------------------------------------------------------------------
-m.avg            11119	 142	 508	11261	11627	98.7%	95.6%	97.2%
-m.avg(no class)  11128	 133	 499	11261	11627	98.8%	95.7%	97.2%
+m.avg            11081	 160	 546	11241	11627	98.6%	95.3%	96.9%
+m.avg(no class)  11108	 133	 519	11241	11627	98.8%	95.5%	97.1%
 ------------------------------------------------------------------------------
 
 
 ---------------------- Test Results for test Data ---------------------------
                    tp	  fp	  fn	#pred	#exp	P	R	F1
 ------------------------------------------------------------------------------
-brand             236	  64	  38	 300	 274	78.7%	86.1%	82.2%
-drug             1855	 193	 272	2048	2127	90.6%	87.2%	88.9%
-drug_n              0	  10	  72	  10	  72	0.0%	0.0%	0.0%
-group             578	 112	 115	 690	 693	83.8%	83.4%	83.6%
+brand             254	 167	  20	 421	 274	60.3%	92.7%	73.1%
+drug             1676	  70	 451	1746	2127	96.0%	78.8%	86.5%
+drug_n              4	  16	  68	  20	  72	20.0%	5.6%	8.7%
+group             575	 198	 118	 773	 693	74.4%	83.0%	78.4%
 ------------------------------------------------------------------------------
-M.avg            -	-	-	-	-	63.3%	64.2%	63.7%
+M.avg            -	-	-	-	-	62.7%	65.0%	61.7%
 ------------------------------------------------------------------------------
-m.avg            2669	 379	 497	3048	3166	87.6%	84.3%	85.9%
-m.avg(no class)  2819	 229	 347	3048	3166	92.5%	89.0%	90.7%
+m.avg            2509	 451	 657	2960	3166	84.8%	79.2%	81.9%
+m.avg(no class)  2769	 191	 397	2960	3166	93.5%	87.5%	90.4%
 ------------------------------------------------------------------------------
 
 
 ---------------------- Test Results for devel Data ---------------------------
                    tp	  fp	  fn	#pred	#exp	P	R	F1
 ------------------------------------------------------------------------------
-brand             296	  40	  78	 336	 374	88.1%	79.1%	83.4%
-drug             1747	 192	 159	1939	1906	90.1%	91.7%	90.9%
-drug_n              6	   7	  39	  13	  45	46.2%	13.3%	20.7%
-group             558	  82	 129	 640	 687	87.2%	81.2%	84.1%
+brand             328	 181	  46	 509	 374	64.4%	87.7%	74.3%
+drug             1487	  81	 419	1568	1906	94.8%	78.0%	85.6%
+drug_n              9	  10	  36	  19	  45	47.4%	20.0%	28.1%
+group             562	 180	 125	 742	 687	75.7%	81.8%	78.7%
 ------------------------------------------------------------------------------
-M.avg            -	-	-	-	-	77.9%	66.3%	69.8%
+M.avg            -	-	-	-	-	70.6%	66.9%	66.7%
 ------------------------------------------------------------------------------
-m.avg            2607	 321	 405	2928	3012	89.0%	86.6%	87.8%
-m.avg(no class)  2710	 218	 302	2928	3012	92.6%	90.0%	91.2%
+m.avg            2386	 452	 626	2838	3012	84.1%	79.2%	81.6%
+m.avg(no class)  2654	 184	 358	2838	3012	93.5%	88.1%	90.7%
 ------------------------------------------------------------------------------
 
 
 [neptune] [info   ] Shutting down background jobs, please wait a moment...
 [neptune] [info   ] Done!
-[neptune] [info   ] Waiting for the remaining 114 operations to synchronize with Neptune. Do not kill this process.
-[neptune] [info   ] All 114 operations synced, thanks for waiting!
-[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-204/metadata
+[neptune] [info   ] Waiting for the remaining 109 operations to synchronize with Neptune. Do not kill this process.
+[neptune] [info   ] All 109 operations synced, thanks for waiting!
+[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-213/metadata

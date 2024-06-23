@@ -60,13 +60,13 @@ class nercLSTM(nn.Module):
         combined_input_size = 400 + 200 + 200 + 200 + 200 + 400 + additional_feature_dim  # Corrected combined input size
         #combined_input_size = 400 + 200 + 400 + additional_feature_dim  # Corrected combined input size
 
-        self.lstm_combined = nn.LSTM(combined_input_size, 400, bidirectional=True, batch_first=True)
+        self.lstm_combined = nn.LSTM(combined_input_size, 600, bidirectional=True, batch_first=True)
 
-        self.attention = Attention(800)
+        self.attention = Attention(1200)
         
-        self.fc1 = nn.Linear(800, 400)
-        self.fc2 = nn.Linear(400, 200)
-        self.out = nn.Linear(200, n_labels)
+        self.fc1 = nn.Linear(1200, 600)
+        self.fc2 = nn.Linear(600, 300)
+        self.out = nn.Linear(300, n_labels)
         
         
     def forward(self, w, s, p, l, pos, lemma, Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos):
