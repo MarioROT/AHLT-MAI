@@ -3,7 +3,7 @@ $AHLT = "../"
 
 # Train NN
 Write-Output "Training NN"
-python train.py "$AHLT/data/train" "$AHLT/data/devel" 10 mymodel
+python train.py "$AHLT/data/train" "$AHLT/data/devel" 15 mymodel
 
 # Run model on devel data and compute performance
 Write-Output "Predicting train"
