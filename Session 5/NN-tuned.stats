@@ -1,8 +1,51 @@
-[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-194
+[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-204
+---------------------- Test Results for train Data ---------------------------
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+brand            1143	   9	  15	1152	1158	99.2%	98.7%	99.0%
+drug             7003	  29	 253	7032	7256	99.6%	96.5%	98.0%
+drug_n            430	  51	  97	 481	 527	89.4%	81.6%	85.3%
+group            2543	  53	 143	2596	2686	98.0%	94.7%	96.3%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	96.5%	92.9%	94.6%
+------------------------------------------------------------------------------
+m.avg            11119	 142	 508	11261	11627	98.7%	95.6%	97.2%
+m.avg(no class)  11128	 133	 499	11261	11627	98.8%	95.7%	97.2%
+------------------------------------------------------------------------------
+
+
+---------------------- Test Results for test Data ---------------------------
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+brand             236	  64	  38	 300	 274	78.7%	86.1%	82.2%
+drug             1855	 193	 272	2048	2127	90.6%	87.2%	88.9%
+drug_n              0	  10	  72	  10	  72	0.0%	0.0%	0.0%
+group             578	 112	 115	 690	 693	83.8%	83.4%	83.6%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	63.3%	64.2%	63.7%
+------------------------------------------------------------------------------
+m.avg            2669	 379	 497	3048	3166	87.6%	84.3%	85.9%
+m.avg(no class)  2819	 229	 347	3048	3166	92.5%	89.0%	90.7%
+------------------------------------------------------------------------------
+
+
+---------------------- Test Results for devel Data ---------------------------
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+brand             296	  40	  78	 336	 374	88.1%	79.1%	83.4%
+drug             1747	 192	 159	1939	1906	90.1%	91.7%	90.9%
+drug_n              6	   7	  39	  13	  45	46.2%	13.3%	20.7%
+group             558	  82	 129	 640	 687	87.2%	81.2%	84.1%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	77.9%	66.3%	69.8%
+------------------------------------------------------------------------------
+m.avg            2607	 321	 405	2928	3012	89.0%	86.6%	87.8%
+m.avg(no class)  2710	 218	 302	2928	3012	92.6%	90.0%	91.2%
+------------------------------------------------------------------------------
+
+
 [neptune] [info   ] Shutting down background jobs, please wait a moment...
 [neptune] [info   ] Done!
-[neptune] [info   ] Waiting for the remaining 153 operations to synchronize with Neptune. Do not kill this process.
-[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file C:\Users\mario\Github\UPC\AHLT - Advanced Human Language Technologies\Session 5\test-NN.out: Path not found or is a not a file.
-[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file C:\Users\mario\Github\UPC\AHLT - Advanced Human Language Technologies\Session 5\train-NN.out: Path not found or is a not a file.
-[neptune] [info   ] All 153 operations synced, thanks for waiting!
-[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-194/metadata
+[neptune] [info   ] Waiting for the remaining 114 operations to synchronize with Neptune. Do not kill this process.
+[neptune] [info   ] All 114 operations synced, thanks for waiting!
+[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-204/metadata

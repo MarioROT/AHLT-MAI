@@ -118,9 +118,10 @@ traindata = Dataset(traindir)
 valdata = Dataset(validationdir)
 
 # create indexes from training data
-max_len = 250
-suf_len = 6
-codes  = Codemaps(traindata, max_len, suf_len)
+max_len = 150
+suf_len = 5
+pre_len = 5
+codes  = Codemaps(traindata, max_len, suf_len, pre_len)
 
 # encode datasets
 train_loader = encode_dataset(traindata, codes)
