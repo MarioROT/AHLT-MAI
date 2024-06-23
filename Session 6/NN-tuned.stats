@@ -1,0 +1,53 @@
+[neptune] [info   ] Neptune initialized. Open in the app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-219
+---------------------- Test Results for train Data ---------------------------
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+advise            694	   6	   3	 700	 697	99.1%	99.6%	99.4%
+effect           1406	  30	  44	1436	1450	97.9%	97.0%	97.4%
+int               230	  59	   1	 289	 231	79.6%	99.6%	88.5%
+mechanism        1011	  20	   9	1031	1020	98.1%	99.1%	98.6%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	93.7%	98.8%	96.0%
+------------------------------------------------------------------------------
+m.avg            3341	 115	  57	3456	3398	96.7%	98.3%	97.5%
+m.avg(no class)  3393	  63	   5	3456	3398	98.2%	99.9%	99.0%
+------------------------------------------------------------------------------
+
+
+---------------------- Test Results for test Data ---------------------------
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+advise            126	  54	  83	 180	 209	70.0%	60.3%	64.8%
+effect            186	 114	 100	 300	 286	62.0%	65.0%	63.5%
+int                 6	  87	  19	  93	  25	6.5%	24.0%	10.2%
+mechanism         212	 135	 128	 347	 340	61.1%	62.4%	61.7%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	49.9%	52.9%	50.0%
+------------------------------------------------------------------------------
+m.avg             530	 390	 330	 920	 860	57.6%	61.6%	59.6%
+m.avg(no class)   628	 292	 232	 920	 860	68.3%	73.0%	70.6%
+------------------------------------------------------------------------------
+
+
+---------------------- Test Results for devel Data ---------------------------
+                   tp	  fp	  fn	#pred	#exp	P	R	F1
+------------------------------------------------------------------------------
+advise            105	  54	  36	 159	 141	66.0%	74.5%	70.0%
+effect            204	 115	 108	 319	 312	63.9%	65.4%	64.7%
+int                22	  24	   6	  46	  28	47.8%	78.6%	59.5%
+mechanism         181	 127	  80	 308	 261	58.8%	69.3%	63.6%
+------------------------------------------------------------------------------
+M.avg            -	-	-	-	-	59.1%	71.9%	64.4%
+------------------------------------------------------------------------------
+m.avg             512	 320	 230	 832	 742	61.5%	69.0%	65.1%
+m.avg(no class)   564	 268	 178	 832	 742	67.8%	76.0%	71.7%
+------------------------------------------------------------------------------
+
+
+[neptune] [info   ] Shutting down background jobs, please wait a moment...
+[neptune] [info   ] Done!
+[neptune] [info   ] Waiting for the remaining 113 operations to synchronize with Neptune. Do not kill this process.
+[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file /home/mario-rot/Github/UPC/AHLT - Advanced Human Language Technologies/Session 6/mymodel/codemaps.idx: Path not found or is a not a file.
+[neptune] [error  ] Error occurred during asynchronous operation processing: Cannot upload file /home/mario-rot/Github/UPC/AHLT - Advanced Human Language Technologies/Session 6/mymodel/network.nn: Path not found or is a not a file.
+[neptune] [info   ] All 113 operations synced, thanks for waiting!
+[neptune] [info   ] Explore the metadata in the Neptune app: https://app.neptune.ai/projects.mai.bcn/AHLT/e/AHLT-219/metadata

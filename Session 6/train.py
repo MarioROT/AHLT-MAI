@@ -14,8 +14,8 @@ from codemaps import *
 
 from network import ddiCNN, criterion
 
-random.seed(12345)
-torch.manual_seed(121212)
+# random.seed(12345)
+# torch.manual_seed(121212)
 
 #----------------------------------------------
 def train(epoch):
@@ -90,10 +90,10 @@ def encode_dataset(ds, codes) :
    return DataLoader(TensorDataset(*X, y), batch_size=16)
 
 
-## --------- MAIN PROGRAM ----------- 
-## --
-## -- Usage:  train.py train.pck devel.pck n_epochs modelname
-## --
+# ## --------- MAIN PROGRAM ----------- 
+# ## --
+# ## -- Usage:  train.py train.pck devel.pck n_epochs modelname
+# ## --
 
 # pickle files with datasets to use
 trainfile = sys.argv[1]
@@ -117,7 +117,7 @@ val_loader = encode_dataset(valdata, codes)
 
 # build network
 network = ddiCNN(codes)
-optimizer = optim.Adam(network.parameters())
+optimizer = optim.Adam(network.parameters(), lr=0.0009)
 if torch.cuda.is_available() :
    # load network into GPU if available
    network.to(torch.device("cuda:0"))
@@ -134,4 +134,5 @@ for epoch in range(n_epochs):
 os.makedirs(modelname,exist_ok=True)
 torch.save(network, modelname+"/network.nn")
 codes.save(modelname+"/codemaps")
+
 
