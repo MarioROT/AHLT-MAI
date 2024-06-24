@@ -244,7 +244,7 @@ if __name__ == "__main__":
         run = neptune.init_run(
             project="projects.mai.bcn/AHLT",
             api_token=config['NPT_MAI_PB'],
-            tags=['NERC' if p["task"] == 'NER' else 'DDI', use_neptune]
+            tags=['NERC-NN' if p["task"] == 'NER' else 'DDI-NN', use_neptune]
         )  # your credentials
 
 
@@ -252,10 +252,18 @@ if __name__ == "__main__":
         run["parameters"] = p
         for dataName in ["train", "devel", "test"]:
             run[f"results/{dataName}-"+p["outfile"]].upload(f"{dataName}-" + p["outfile"])
-        if any([i in use_neptune for i in ['NER-ML']]):
-            run['files/extract-features'].upload('../Session 2/extract-features.py')
-        if any([i in use_neptune for i in ['DDI-ML']]):
-            run['files/extract-features'].upload('../Session 4/extract-features.py')
+        if any([i in use_neptune for i in ['NER-NN']]):
+            run['files/network.nn'].upload('../Session 5/mymodel/network.nn')
+            run['files/codemaps.idx'].upload('../Session 5/mymodel/codemaps.idx')
+            run['files/train.py'].upload('../Session 5/train.py')
+            run['files/network.py'].upload('../Session 5/network.py')
+            run['files/codemaps.py'].upload('../Session 5/codemaps.py')
+        if any([i in use_neptune for i in ['DDI-NN']]):
+            run['files/network.nn'].upload('../Session 6/mymodel/network.nn')
+            run['files/codemaps.idx'].upload('../Session 6/mymodel/codemaps.idx')
+            run['files/train.py'].upload('../Session 6/train.py')
+            run['files/network.py'].upload('../Session 6/network.py')
+            run['files/codemaps.py'].upload('../Session 6/codemaps.py')
         
         evaluate(p['task'], p['datadir'], p['outfile'], run)
         run.stop()

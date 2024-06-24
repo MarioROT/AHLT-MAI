@@ -19,8 +19,8 @@ from neptune.types import File
 from dotenv import dotenv_values
 
 
-random.seed(12345)
-torch.manual_seed(121212)
+# random.seed(12345)
+# torch.manual_seed(121212)
 
 #----------------------------------------------
 def train(epoch):
@@ -87,7 +87,22 @@ def encode_dataset(ds, codes) :
    return DataLoader(TensorDataset(*X, y), 
                      batch_size=16)
 
-
+def load_glove_embeddings(file_path, word_index, embedding_dim=200):
+    embeddings_index = {}
+    with open(file_path, encoding='utf-8') as f:
+        for line in f:
+            values = line.split()
+            word = values[0]
+            coefs = np.asarray(values[1:], dtype='float32')
+            embeddings_index[word] = coefs
+    
+    embedding_matrix = np.zeros((len(word_index), embedding_dim))
+    for word, i in word_index.items():
+        embedding_vector = embeddings_index.get(word)
+        if embedding_vector is not None:
+            embedding_matrix[i] = embedding_vector
+    
+    return embedding_matrix
 
 ## --------- MAIN PROGRAM ----------- 
 ## --
@@ -118,9 +133,10 @@ traindata = Dataset(traindir)
 valdata = Dataset(validationdir)
 
 # create indexes from training data
-max_len = 250
-suf_len = 6
-codes  = Codemaps(traindata, max_len, suf_len)
+max_len = 150
+suf_len = 5
+pre_len = 5
+codes  = Codemaps(traindata, max_len, suf_len, pre_len)
 
 # encode datasets
 train_loader = encode_dataset(traindata, codes)
@@ -128,7 +144,7 @@ val_loader = encode_dataset(valdata, codes)
 
 # build network
 network = nercLSTM(codes)
-optimizer = optim.Adam(network.parameters(), lr=0.001)
+optimizer = optim.Adam(network.parameters())#, lr=0.003)
 if torch.cuda.is_available() :
    network.to(torch.device("cuda:0"))
 
