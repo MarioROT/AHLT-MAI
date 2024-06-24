@@ -7,8 +7,8 @@ if [[ "$*" == *"parse"* ]]; then
    # sleep 1
 
    PYTHONPATH=$AHLT/util
-   # python parse_data.py "$AHLT/data/train" "train"
-   # python parse_data.py "$AHLT/data/devel" "devel"
+   python parse_data.py "$AHLT/data/train" "train"
+   python parse_data.py "$AHLT/data/devel" "devel"
    python parse_data.py "$AHLT/data/test" "test"
    # kill `cat /tmp/corenlp-server.running`
 fi
