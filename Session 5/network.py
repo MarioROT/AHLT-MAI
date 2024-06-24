@@ -44,25 +44,25 @@ criterion = nn.CrossEntropyLoss()
 #         n_sufs = codes.get_n_sufs()
 #         n_labels = codes.get_n_labels()
 
-#         self.embW = nn.Embedding(n_words, 200)
-#         self.embS = nn.Embedding(n_sufs, 100)
-#         self.embL = nn.Embedding(n_words, 200)  # Embedding for lowercased words
-#         self.dropW = nn.Dropout(0.3)
-#         self.dropS = nn.Dropout(0.3)
-#         self.dropL = nn.Dropout(0.3)  # Dropout for lowercased words
+        # self.embW = nn.Embedding(n_words, 200)
+        # self.embS = nn.Embedding(n_sufs, 100)
+        # self.embL = nn.Embedding(n_words, 100)  # Embedding for lowercased words
+        # self.dropW = nn.Dropout(0.5)
+        # self.dropS = nn.Dropout(0.5)
+        # self.dropL = nn.Dropout(0.5)  # Dropout for lowercased words
 
 #         additional_feature_dim = 7  # Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos
 
-#         self.lstm_word = nn.LSTM(200, 200, bidirectional=True, batch_first=True)
-#         self.lstm_suf = nn.LSTM(100, 100, bidirectional=True, batch_first=True)
-#         self.lstm_lower = nn.LSTM(200, 200, bidirectional=True, batch_first=True)  # LSTM for lowercased words
+        # self.lstm_word = nn.LSTM(200, 50, bidirectional=True, batch_first=True)
+        # self.lstm_suf = nn.LSTM(100, 50, bidirectional=True, batch_first=True)
+        # self.lstm_lower = nn.LSTM(100, 50, bidirectional=True, batch_first=True)  # LSTM for lowercased words
 
-#         combined_input_size = 400 + 200 + 400 + additional_feature_dim  # Corrected combined input size
-#         self.lstm_combined = nn.LSTM(combined_input_size, 400, bidirectional=True, batch_first=True)
+        # combined_input_size = 100 + 100 + 100 + additional_feature_dim  # Corrected combined input size
+        # self.lstm_combined = nn.LSTM(combined_input_size, 200, bidirectional=True, batch_first=True)
 
-#         self.fc1 = nn.Linear(800, 400)
-#         self.fc2 = nn.Linear(400, 200)
-#         self.out = nn.Linear(200, n_labels)
+        # self.fc1 = nn.Linear(400, 1000)
+        # self.fc2 = nn.Linear(1000, 500)
+        # self.out = nn.Linear(500, n_labels)
 
 #     def forward(self, w, s, l, Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos):
 #         x = self.embW(w)
@@ -90,6 +90,8 @@ criterion = nn.CrossEntropyLoss()
 #         output = self.out(fc_output)
         
 #         return output
+
+
 
 
 ############################################################
@@ -272,27 +274,27 @@ class nercLSTM(nn.Module):
 #       x = self.lstm(x)[0]              
 #       x = self.out(x)
 #       return x
-        pos = self.embL(Xpos)
-        pos = self.dropL(pos)
-        pos, _ = self.lstm_lower(pos)
+        # pos = self.embL(Xpos)
+        # pos = self.dropL(pos)
+        # pos, _ = self.lstm_lower(pos)
 
-        # combined_embeddings = torch.cat((x, y, y2, z), dim=2)
-        combined_embeddings = torch.cat((x, y, y2, z, cap, dash, num, ext, special, len, pos), dim=2)
+        # # combined_embeddings = torch.cat((x, y, y2, z), dim=2)
+        # combined_embeddings = torch.cat((x, y, y2, z, cap, dash, num, ext, special, len, pos), dim=2)
 
-        # additional_features = torch.stack((Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos), dim=2).float()
-        combined_features = torch.cat((combined_embeddings, additional_features), dim=2)
+        # # additional_features = torch.stack((Xcap, Xdash, Xnum, Xext, Xspecial, Xlen, Xpos), dim=2).float()
+        # combined_features = torch.cat((combined_embeddings, additional_features), dim=2)
 
-        combined_features, _ = self.lstm_combined(combined_features)
+        # combined_features, _ = self.lstm_combined(combined_features)
 
-        # attention_output = self.attention(combined_features)  # Apply attention mechanism
-        attention_output = combined_features
+        # # attention_output = self.attention(combined_features)  # Apply attention mechanism
+        # attention_output = combined_features
         
-        fc_output = torch.relu(self.fc1(attention_output))
-        fc_output = torch.relu(self.fc2(fc_output))
+        # fc_output = torch.relu(self.fc1(attention_output))
+        # fc_output = torch.relu(self.fc2(fc_output))
 
-        output = self.out(fc_output)
+        # output = self.out(fc_output)
         
-        return output
+        # return output
 
 # class nercLSTM(nn.Module):
 #    def __init__(self, codes) :
